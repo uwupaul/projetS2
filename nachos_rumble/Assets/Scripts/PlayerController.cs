@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour, IDamagable
     bool grounded;
     Vector3 smoothMoveVelocity;
     private Vector3 moveAmount;
+    private bool EscapeMod;
     
     Rigidbody rb;
 
@@ -44,13 +45,17 @@ public class PlayerController : MonoBehaviour, IDamagable
             Destroy(GetComponentInChildren<Camera>().gameObject);
             Destroy(rb);
         }
+        
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        UnityEngine.Cursor.visible = false;
     }
 
     void Update()
     {
         if(!PV.IsMine)
             return;
-        Look();
+        if (!EscapeMod)
+            Look();
         Move();
         Jump();
 
@@ -67,6 +72,8 @@ public class PlayerController : MonoBehaviour, IDamagable
         {
             items[itemIndex].Use();
         }
+
+        Cursor();
     }
 
     void Move()
@@ -141,6 +148,25 @@ public class PlayerController : MonoBehaviour, IDamagable
         if (currentHealth <= 0)
         {
             Die();
+        }
+    }
+
+    void Cursor()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            EscapeMod = !EscapeMod;
+        }
+        
+        if (EscapeMod && UnityEngine.Cursor.lockState == CursorLockMode.Locked)
+        {
+            UnityEngine.Cursor.lockState = CursorLockMode.None;
+            UnityEngine.Cursor.visible = true;
+        }
+        else if (!EscapeMod && UnityEngine.Cursor.lockState == CursorLockMode.None)
+        {
+            UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+            UnityEngine.Cursor.visible = false;
         }
     }
 

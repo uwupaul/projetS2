@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
+using Photon.Realtime;
 
-public class PlayerController : MonoBehaviour, IDamagable
+public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
 {
     // Start is called before the first frame update
     [SerializeField] GameObject cameraHolder;
@@ -117,7 +119,22 @@ public class PlayerController : MonoBehaviour, IDamagable
         }
 
         previousItemIndex = itemIndex;
+
+		if (PV.IsMine)
+		{
+			Hashtable hash = new Hashtable();
+			hash.Add("itemIndex", itemIndex);
+			PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+		}
     }
+
+	public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+	{
+		if (!PV.IsMine && targetPlayer == PV.Owner)
+		{
+			EquipItem((int)changedProps["itemIndex"]);
+		}
+	}
 
     private void FixedUpdate()
     {

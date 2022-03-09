@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
     private Vector3 moveAmount;
     private bool EscapeMod;
     
+    
     Rigidbody rb;
 
     PhotonView PV;
@@ -86,10 +87,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
     void Move()
     {
         Vector3 moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
-
         moveAmount = Vector3.SmoothDamp(moveAmount,
-            moveDir * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed), ref smoothMoveVelocity, smoothTime);
-
+                moveDir * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed), ref smoothMoveVelocity, smoothTime);
     }
 
     void Jump()

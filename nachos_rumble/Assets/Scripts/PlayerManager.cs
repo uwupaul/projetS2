@@ -9,6 +9,7 @@ public class PlayerManager : MonoBehaviour
 {
     // Start is called before the first frame update
     PhotonView PV;
+    GameObject controller;
 
     private void Awake()
     {
@@ -26,6 +27,12 @@ public class PlayerManager : MonoBehaviour
     // Update is called once per frame
     void CreateController()
     {
-        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs","PlayerController"),Vector3.zero,Quaternion.identity);
+        controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs","PlayerController"),Vector3.zero,Quaternion.identity, 0, new object[] { PV.ViewID });
+    }
+
+    public void Die()
+    {
+        PhotonNetwork.Destroy(controller);
+        CreateController();
     }
 }

@@ -9,7 +9,10 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     [SerializeField] GameObject cameraHolder;
     [SerializeField] float mouseSensitivity, sprintSpeed, walkSpeed, jumpForce, smoothTime;
-
+    
+    [SerializeField] Item[] items;
+    int itemIndex;
+    int previousItemIndex = -1;
     float verticalLookRotation;
     bool grounded;
     Vector3 smoothMoveVelocity;
@@ -27,10 +30,14 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        if (!PV.IsMine)
+        if (PV.IsMine)
         {
-           Destroy(GetComponentInChildren<Camera>().gameObject); 
-           Destroy(rb);
+           EquipItem(0);
+        }
+        else
+        {
+            Destroy(GetComponentInChildren<Camera>().gameObject);
+            Destroy(rb);
         }
     }
 
@@ -41,6 +48,15 @@ public class PlayerController : MonoBehaviour
         Look();
         Move();
         Jump();
+
+        for (int i = 0; i < items.Length; i++)
+        {
+            if (Input.GetKeyDown((i + 1).ToString()))
+            {
+                EquipItem(i);
+                break;
+            }
+        }
     }
 
     void Move()
@@ -69,10 +85,28 @@ public class PlayerController : MonoBehaviour
 
         cameraHolder.transform.localEulerAngles = Vector3.left * verticalLookRotation;
     }
+    
 
     public void SetGroundedState(bool _grounded)
     {
         grounded = _grounded;
+    }
+
+    void EquipItem(int _index)
+    {
+        if (_index == previousItemIndex)
+        {
+            return;
+        }
+        itemIndex = _index;
+        items[itemIndex].itemGameObject.SetActive(true);
+
+        if (previousItemIndex != -1)
+        {
+            items[previousItemIndex].itemGameObject.SetActive(false);
+        }
+
+        previousItemIndex = itemIndex;
     }
 
     private void FixedUpdate()

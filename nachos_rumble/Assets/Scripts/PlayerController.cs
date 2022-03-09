@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
             Destroy(GetComponentInChildren<Camera>().gameObject);
             Destroy(rb);
         }
-        
+
         UnityEngine.Cursor.lockState = CursorLockMode.Locked;
         UnityEngine.Cursor.visible = false;
     }
@@ -73,6 +73,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
         if (Input.GetMouseButtonDown(0))
         {
             items[itemIndex].Use();
+        }
+
+        if (transform.position.y < -10f)
+        {
+            Die();
         }
 
         Cursor();
@@ -160,8 +165,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
     {
         if (!PV.IsMine)
             return;
-
+        
         currentHealth -= damage;
+        
         if (currentHealth <= 0)
         {
             Die();

@@ -5,6 +5,7 @@ using Photon.Pun;
 using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Photon.Realtime;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
 {
@@ -26,6 +27,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
     PhotonView PV;
     PlayerManager playerManager;
     
+
+    private Text textHealth;
     const float maxHealth = 100f;
     float currentHealth = maxHealth;
 
@@ -50,6 +53,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        textHealth = GameObject.Find("TextHealth").GetComponent<Text>();
+
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        UnityEngine.Cursor.visible = false;
     }
 
     void Update()
@@ -65,6 +72,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
             Jump();
             UseItem();
         }
+
+        textHealth.text = currentHealth + "/100";
 
         if (EscapeMod)
         {
@@ -101,7 +110,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
     void Move()
     {
         Vector3 moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
-
         moveAmount = Vector3.SmoothDamp(moveAmount,
             moveDir * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed), ref smoothMoveVelocity, smoothTime);
     }

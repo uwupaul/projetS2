@@ -40,4 +40,16 @@ public class MenuManager : MonoBehaviour
     {
         menu.Close();
     }
+
+    public void CloseMenu(string name)
+    {
+        foreach (Menu menu in menus)
+        {
+            if (menu.menuName == name)
+            {
+                menu.Close();
+                return;
+            }
+        }
+    }
 }

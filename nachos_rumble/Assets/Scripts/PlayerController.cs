@@ -8,26 +8,26 @@ using Photon.Realtime;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
 {
-    // Start is called before the first frame update
     [SerializeField] GameObject cameraHolder;
-    [SerializeField] float mouseSensitivity, sprintSpeed, walkSpeed, jumpForce, smoothTime;
-    
+    [SerializeField] float sprintSpeed, walkSpeed, jumpForce, smoothTime;
     [SerializeField] Item[] items;
+    public float mouseSensitivity;
+    
     int itemIndex;
     int previousItemIndex = -1;
     float verticalLookRotation;
     bool grounded;
     Vector3 smoothMoveVelocity;
     private Vector3 moveAmount;
-    private bool EscapeMod;
     
+    private bool EscapeMod;
+
     Rigidbody rb;
-
     PhotonView PV;
-
+    PlayerManager playerManager;
+    
     const float maxHealth = 100f;
     float currentHealth = maxHealth;
-    PlayerManager playerManager;
 
     void Awake()
     {
@@ -48,19 +48,43 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
             Destroy(rb);
         }
 
-        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-        UnityEngine.Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void Update()
     {
         if(!PV.IsMine)
             return;
+        
+        Escape();
         if (!EscapeMod)
+        {
             Look();
-        Move();
-        Jump();
+            Move();
+            Jump();
+            UseItem();
+        }
 
+        if (EscapeMod)
+        {
+            moveAmount = Vector3.SmoothDamp(moveAmount,
+                new Vector3(0,0,0) * 0, ref smoothMoveVelocity, smoothTime);
+        }
+        
+        if (transform.position.y < -10f)
+            Die();
+    }
+    
+    private void FixedUpdate()
+    {
+        if(!PV.IsMine)
+            return;
+        rb.MovePosition(rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
+    }
+
+    void UseItem() //utiliser les items (souvent gun)
+    {
         for (int i = 0; i < items.Length; i++)
         {
             if (Input.GetKeyDown((i + 1).ToString()))
@@ -71,16 +95,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
         }
 
         if (Input.GetMouseButtonDown(0))
-        {
             items[itemIndex].Use();
-        }
-
-        if (transform.position.y < -10f)
-        {
-            Die();
-        }
-
-        Cursor();
     }
 
     void Move()
@@ -89,7 +104,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
 
         moveAmount = Vector3.SmoothDamp(moveAmount,
             moveDir * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed), ref smoothMoveVelocity, smoothTime);
-
     }
 
     void Jump()
@@ -148,13 +162,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
 		}
 	}
 
-    private void FixedUpdate()
-    {
-        if(!PV.IsMine)
-            return;
-        rb.MovePosition(rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
-    }
-
     public void TakeDamage(float damage)
     {
         PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
@@ -169,27 +176,24 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
         currentHealth -= damage;
         
         if (currentHealth <= 0)
-        {
             Die();
-        }
     }
 
-    void Cursor()
+    void Escape()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
-        {
             EscapeMod = !EscapeMod;
-        }
         
-        if (EscapeMod && UnityEngine.Cursor.lockState == CursorLockMode.Locked)
+
+        if (EscapeMod && (Cursor.lockState == CursorLockMode.Locked || !Cursor.visible))
         {
-            UnityEngine.Cursor.lockState = CursorLockMode.None;
-            UnityEngine.Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
-        else if (!EscapeMod && UnityEngine.Cursor.lockState == CursorLockMode.None)
+        else if (!EscapeMod && (Cursor.lockState == CursorLockMode.None || Cursor.visible))
         {
-            UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-            UnityEngine.Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
     }
 

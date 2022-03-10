@@ -5,6 +5,7 @@ using Photon.Pun;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.IO;
+using Photon.Realtime;
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
@@ -12,11 +13,13 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     void Awake()
     {
-        if (Instance) // verifie si une autre roomManager exists
+        if (Instance && Instance != this)// verifie si une autre roomManager exists
         {
-            Destroy(gameObject); // il ne peut y en avaoir que un 
+            Debug.Log("y'a 2 room manager");
+            Destroy(gameObject); // il ne peut y en avoir que un 
             return;
         }
+        Debug.Log("y'a qu'1 room manager");
         DontDestroyOnLoad(gameObject); // il est le seul.
         Instance = this;
     }

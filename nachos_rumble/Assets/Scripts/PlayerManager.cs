@@ -7,7 +7,6 @@ using System.IO;
 
 public class PlayerManager : MonoBehaviour
 {
-    // Start is called before the first frame update
     PhotonView PV;
     GameObject controller;
 

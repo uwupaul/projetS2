@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -28,6 +29,18 @@ public class SettingsMenu : MonoBehaviour
     public void Toggle()
     {
         gameObject.SetActive(!gameObject.activeSelf);
+        PC.EscapeMod = !PC.EscapeMod;
+        
+        if (!PC.EscapeMod)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
     }
 
     public void SetMasterVolume(float volume)
@@ -53,6 +66,7 @@ public class SettingsMenu : MonoBehaviour
     
     public void QuitRoom()
     {
-        PhotonNetwork.LoadLevel(0);
+        Destroy(RoomManager.Instance.gameObject);
+        PhotonNetwork.LeaveRoom();
     }
 }

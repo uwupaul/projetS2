@@ -31,10 +31,12 @@ public class Launcher : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.LeaveRoom();
             MenuManager.menuManager.OpenMenu("title");
+            Debug.Log("was in room");
         }
         if (PhotonNetwork.IsConnected)
         {
             MenuManager.menuManager.OpenMenu("title");
+            Debug.Log("Not in Room but connected");
         }
         else
         {

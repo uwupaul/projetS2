@@ -281,6 +281,7 @@ MonoBehaviour:
   - {fileID: 6682682439688860012}
   - {fileID: 5187640237091012822}
   mouseSensitivity: 1
+  EscapeMod: 0
 --- !u!1 &1548255093371761066
 GameObject:
   m_ObjectHideFlags: 0

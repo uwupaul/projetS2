@@ -20,8 +20,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
     bool grounded;
     Vector3 smoothMoveVelocity;
     private Vector3 moveAmount;
-    
-    private bool EscapeMod;
+
+    public bool EscapeMod;
 
     Rigidbody rb;
     PhotonView PV;
@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
         rb = GetComponent<Rigidbody>();
         PV = GetComponent<PhotonView>();
         playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
+        EscapeMod = false;
     }
 
     void Start()
@@ -61,21 +62,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
         if(!PV.IsMine)
             return;
         
-        Escape();
-        if (!EscapeMod)
-        {
-            Look();
-            Move();
-            Jump();
-            UseItem();
-        }
-
         textHealth.text = currentHealth + "";
         
         if (EscapeMod)
         {
             moveAmount = Vector3.SmoothDamp(moveAmount,
                 new Vector3(0,0,0) * 0, ref smoothMoveVelocity, smoothTime);
+        }
+        else
+        {
+            Look(); Move(); Jump(); UseItem();
         }
         
         if (transform.position.y < -10f)
@@ -183,24 +179,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
         
         if (currentHealth <= 0)
             Die();
-    }
-
-    void Escape()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-            EscapeMod = !EscapeMod;
-        
-
-        if (EscapeMod && (Cursor.lockState == CursorLockMode.Locked || !Cursor.visible))
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
-        else if (!EscapeMod && (Cursor.lockState == CursorLockMode.None || Cursor.visible))
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
     }
 
     void Die()

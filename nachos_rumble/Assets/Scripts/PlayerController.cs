@@ -9,34 +9,41 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
 {
-    [SerializeField] GameObject cameraHolder;
-    [SerializeField] float sprintSpeed, walkSpeed, jumpForce, smoothTime;
-    [SerializeField] Item[] items;
-    public float mouseSensitivity;
-    
-    int itemIndex;
-    int previousItemIndex = -1;
-    float verticalLookRotation;
-    bool grounded;
-    Vector3 smoothMoveVelocity;
-    private Vector3 moveAmount;
+    #region Items
+        [SerializeField] Item[] items;
+        int itemIndex;
+        int previousItemIndex = -1;
+    #endregion
 
-    public bool EscapeMod;
+    #region Physics
+        [SerializeField] GameObject cameraHolder;
+        [SerializeField] float sprintSpeed, walkSpeed, jumpForce, smoothTime;
+        public float mouseSensitivity;
+        float verticalLookRotation;
+        bool grounded;
+        Vector3 smoothMoveVelocity;
+        private Vector3 moveAmount;
+    #endregion
+    
+    #region Health
+        private Text textHealth;
+        const float maxHealth = 100f;
+        float currentHealth = maxHealth;
+    #endregion
 
     Rigidbody rb;
     PhotonView PV;
     PlayerManager playerManager;
+    GameManager _gameManager;
 
-    private Text textHealth;
-    const float maxHealth = 100f;
-    float currentHealth = maxHealth;
-
+    public bool EscapeMod => _gameManager.EscapeMod;
+    
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         PV = GetComponent<PhotonView>();
         playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
-        EscapeMod = false;
+        _gameManager = FindObjectOfType<GameManager>();
     }
 
     void Start()
@@ -53,8 +60,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
 
         textHealth = GameObject.Find("TextHealth").GetComponent<Text>();
         
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        if (!EscapeMod)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
     }
 
     void Update()

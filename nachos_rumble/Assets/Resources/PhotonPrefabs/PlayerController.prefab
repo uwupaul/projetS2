@@ -272,16 +272,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53a96469533c7d14aaa27109b2d20f79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  items:
+  - {fileID: 6682682439688860012}
+  - {fileID: 5187640237091012822}
   cameraHolder: {fileID: 1810719947681551406}
   sprintSpeed: 4.5
   walkSpeed: 3
   jumpForce: 250
   smoothTime: 0.15
-  items:
-  - {fileID: 6682682439688860012}
-  - {fileID: 5187640237091012822}
   mouseSensitivity: 1
-  EscapeMod: 0
 --- !u!1 &1548255093371761066
 GameObject:
   m_ObjectHideFlags: 0

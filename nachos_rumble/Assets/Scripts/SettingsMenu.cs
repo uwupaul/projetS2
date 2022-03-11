@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
@@ -14,6 +12,13 @@ public class SettingsMenu : MonoBehaviour
     PlayerController PC;
     [SerializeField] Slider masterVolumeSlider;
     [SerializeField] Slider mouseSensitivitySlider;
+    [SerializeField] GameManager _gameManager;
+
+    bool _EscapeMod
+    {
+        get => _gameManager.EscapeMod;
+        set => _gameManager.EscapeMod = value;
+    }
 
     private void Awake()
     {
@@ -29,17 +34,17 @@ public class SettingsMenu : MonoBehaviour
     public void Toggle()
     {
         gameObject.SetActive(!gameObject.activeSelf);
-        PC.EscapeMod = !PC.EscapeMod;
+        _EscapeMod = !_EscapeMod;
         
-        if (!PC.EscapeMod)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
-        else
+        if (_EscapeMod)
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
     }
 

@@ -6,6 +6,7 @@ using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Photon.Realtime;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
 {
@@ -36,6 +37,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
     PlayerManager playerManager;
     GameManager _gameManager;
 
+    private Text ui_username;
+
+    [HideInInspector] public ProfileData playerProfile;
+    public TextMeshPro playerUsername;
+
     public bool EscapeMod => _gameManager.EscapeMod;
     
     void Awake()
@@ -50,14 +56,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
     {
         if (PV.IsMine)
         {
-           EquipItem(0);
+            ui_username = GameObject.Find("Canvas/Username/UsernameText").GetComponent<Text>();
+
+            ui_username.text = Launcher.myProfile.username;
+            
+            photonView.RPC("SyncProfile",RpcTarget.All,Launcher.myProfile.username,Launcher.myProfile.level,Launcher.myProfile.xp);
+
+            EquipItem(0);
         }
         else
         {
             Destroy(GetComponentInChildren<Camera>().gameObject);
             Destroy(rb);
         }
-
+        
         textHealth = GameObject.Find("TextHealth").GetComponent<Text>();
         
         if (!EscapeMod)
@@ -99,6 +111,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
             return;
         rb.MovePosition(rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
     }
+    
+    [PunRPC]
+    private void SyncProfile(string p_username, int p_level,int p_xp) //profile de chq player (username in game)
+    {
+        playerProfile = new ProfileData(p_username,p_level,p_xp);
+        playerUsername.text = playerProfile.username;
+    }
 
     void UseItem() //utiliser les items (souvent gun)
     {
@@ -115,6 +134,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
             items[itemIndex].Use();
     }
 
+    #region Physics Method
+    
     void Move()
     {
         Vector3 moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
@@ -147,6 +168,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
         grounded = _grounded;
     }
 
+    #endregion
     void EquipItem(int _index)
     {
         if (_index == previousItemIndex)

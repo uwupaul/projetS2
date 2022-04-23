@@ -6,11 +6,13 @@ using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Photon.Realtime;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
     #region Items
         [SerializeField] Item[] items;
+        
         int itemIndex;
         int previousItemIndex = -1;
     #endregion
@@ -18,7 +20,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     #region Physics
         [SerializeField] GameObject cameraHolder;
         [SerializeField] float sprintSpeed, walkSpeed, jumpForce, smoothTime;
+        
         public float mouseSensitivity;
+        
         float verticalLookRotation;
         bool grounded;
         Vector3 smoothMoveVelocity;
@@ -26,15 +30,28 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     #endregion
     
     #region Health
-        private Text textHealth;
         const float maxHealth = 100f;
         float currentHealth = maxHealth;
     #endregion
+    
+    #region HUD
+    
+        private Text textHealth;
+    
+        private Text ui_username;
+        public TextMeshPro playerUsername;
 
+    #endregion
+    
+    
     Rigidbody rb;
     PhotonView PV;
     PlayerManager playerManager;
     GameManager _gameManager;
+
+    
+
+    [HideInInspector] public ProfileData playerProfile;
 
     public bool EscapeMod => _gameManager.EscapeMod;
     
@@ -50,14 +67,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         if (PV.IsMine)
         {
-           EquipItem(0);
+            ui_username = GameObject.Find("Canvas/Username/UsernameText").GetComponent<Text>();
+
+            ui_username.text = Launcher.myProfile.username;
+            
+            photonView.RPC("SyncProfile",RpcTarget.All,Launcher.myProfile.username,Launcher.myProfile.level,Launcher.myProfile.xp);
+
+            EquipItem(0);
         }
         else
         {
             Destroy(GetComponentInChildren<Camera>().gameObject);
             Destroy(rb);
         }
-
+        
         textHealth = GameObject.Find("TextHealth").GetComponent<Text>();
         
         if (!EscapeMod)
@@ -99,22 +122,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             return;
         rb.MovePosition(rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
     }
-
-    void UseItem() //utiliser les items (souvent gun)
+    
+    [PunRPC]
+    private void SyncProfile(string p_username, int p_level,int p_xp) //profile de chq player (username in game)
     {
-        for (int i = 0; i < items.Length; i++)
-        {
-            if (Input.GetKeyDown((i + 1).ToString()))
-            {
-                EquipItem(i);
-                break;
-            }
-        }
-
-        if (Input.GetMouseButtonDown(0))
-            items[itemIndex].Use();
+        playerProfile = new ProfileData(p_username,p_level,p_xp);
+        playerUsername.text = playerProfile.username;
     }
 
+    
+
+    #region Physics Method
+    
     void Move()
     {
         Vector3 moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
@@ -147,6 +166,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         grounded = _grounded;
     }
 
+    #endregion
+
+    #region Items Method
     void EquipItem(int _index)
     {
         if (_index == previousItemIndex)
@@ -170,7 +192,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 			PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
 		}
     }
+    void UseItem() //utiliser les items (souvent gun)
+    {
+        for (int i = 0; i < items.Length; i++)
+        {
+            if (Input.GetKeyDown((i + 1).ToString()))
+            {
+                EquipItem(i);
+                break;
+            }
+        }
 
+        if (Input.GetMouseButtonDown(0))
+            items[itemIndex].Use();
+    }
+    #endregion
 	public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
 	{
 		if (!PV.IsMine && targetPlayer == PV.Owner && changedProps.ContainsKey("itemIndex"))

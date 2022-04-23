@@ -36,11 +36,12 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         ApplyDeath();
     }
 
-    void ApplyDeath()
+    private void ApplyDeath()
     {
         Hashtable H = new Hashtable();
-        int deathsOfParent = Convert.ToInt32(PV.Owner.CustomProperties["Deaths"]);
-        H.Add("Deaths", deathsOfParent + 1);
+        int deathOfParent = Convert.ToInt32(PV.Owner.CustomProperties["Death"]);
+        
+        H.Add("Death", deathOfParent + 1);
         PV.Owner.SetCustomProperties(H);
     }
 }

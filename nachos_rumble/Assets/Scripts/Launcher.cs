@@ -4,11 +4,37 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using PlayerData;
 using TMPro;
 using Random = UnityEngine.Random;
+using UnityEngine.UI;
 
+
+[System.Serializable]
+public class ProfileData
+{
+    public string username;
+    public int level;
+    public int xp;
+
+    public ProfileData() //profile par defaut
+    {
+        this.username = "DEFAULT USERNAME";
+        this.level = 0;
+        this.xp = 0;
+    }
+    public ProfileData(string u, int l, int x)
+    {
+        this.username = u;
+        this.level = l;
+        this.xp = x;
+    }
+}
 public class Launcher : MonoBehaviourPunCallbacks
 {
+    public InputField usernameField;
+    public static ProfileData myProfile = new ProfileData();
+    
     public static Launcher launcher;
 
     [SerializeField] TMP_InputField roomNameInputField;
@@ -22,6 +48,9 @@ public class Launcher : MonoBehaviourPunCallbacks
     private void Awake()
     {
         launcher = this;
+
+        myProfile = Data.LoadProfile(); //charger notre profile
+        usernameField.text = myProfile.username;
     }
 
     void Start()
@@ -53,9 +82,11 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
+        Debug.Log(usernameField.text);
+        
         MenuManager.menuManager.OpenMenu("title");
         Debug.Log("Joined Lobby");
-        PhotonNetwork.NickName = "Player" + Random.Range(0, 1000).ToString("0000"); //pour le moment
+        PhotonNetwork.NickName = myProfile.username; //pour le moment A FIX !! , demande a paul
     }
 
     public void CreateRoom()
@@ -72,6 +103,16 @@ public class Launcher : MonoBehaviourPunCallbacks
         MenuManager.menuManager.OpenMenu("room");
         roomNameText.text = PhotonNetwork.CurrentRoom.Name;
         
+        if (string.IsNullOrEmpty(usernameField.text)) // pour les pseudos
+        {
+            myProfile.username = "PLAYER_" + Random.Range(100, 1000);
+        }
+        else
+        {
+            myProfile.username = usernameField.text;
+        }
+        Data.SaveProfile(myProfile); // save le profile
+
         foreach (Transform child in playerListContent)
         {
             Destroy(child.gameObject);
@@ -98,6 +139,15 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public void JoinRoom(RoomInfo info)
     {
+        if (string.IsNullOrEmpty(usernameField.text)) // pour les pseudos
+        {
+            myProfile.username = "PLAYER_" + Random.Range(100, 1000);
+        }
+        else
+        {
+            myProfile.username = usernameField.text;
+        }
+        
         PhotonNetwork.JoinRoom(info.Name);
         MenuManager.menuManager.OpenMenu("loading");
     }
@@ -133,6 +183,16 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public void StartGame()
     {
+        if (string.IsNullOrEmpty(usernameField.text)) // pour les pseudos
+        {
+            myProfile.username = "PLAYER_" + Random.Range(100, 1000);
+        }
+        else
+        {
+            myProfile.username = usernameField.text;
+        }
+        Data.SaveProfile(myProfile); // save le profile
+        
         PhotonNetwork.LoadLevel(1); // load la scène d'index 1 (le jeu)
     }
 

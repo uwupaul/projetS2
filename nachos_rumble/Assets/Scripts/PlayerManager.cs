@@ -23,7 +23,6 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void CreateController()
     {
         Transform spawnpoint = SpawnManager.Instance.GetSpawnPoint();

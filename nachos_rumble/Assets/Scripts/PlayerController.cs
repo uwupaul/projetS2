@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
         float verticalLookRotation;
         bool grounded;
         Vector3 smoothMoveVelocity;
-        private Vector3 moveAmount;
+        Vector3 moveAmount;
     #endregion
     
     #region Health
@@ -200,5 +200,4 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
     {
         playerManager.Die();
     }
-
 }

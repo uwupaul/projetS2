@@ -41,6 +41,15 @@ public class RoomManager : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerManager"), Vector3.zero,
                 Quaternion.identity);
+            // on instancie le playerManager qui nous servira à instantier le playerController et à le gérer, etc.
+            
+            InstantiateAI(); // fait spawn une IA (par personne?)
         }
+    }
+
+    void InstantiateAI()
+    {
+        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "AIManager"), Vector3.zero,
+            Quaternion.identity);
     }
 }

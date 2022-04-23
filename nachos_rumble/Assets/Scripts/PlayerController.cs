@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
 {
     #region Items
         [SerializeField] Item[] items;
+        
         int itemIndex;
         int previousItemIndex = -1;
     #endregion
@@ -19,7 +20,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
     #region Physics
         [SerializeField] GameObject cameraHolder;
         [SerializeField] float sprintSpeed, walkSpeed, jumpForce, smoothTime;
+        
         public float mouseSensitivity;
+        
         float verticalLookRotation;
         bool grounded;
         Vector3 smoothMoveVelocity;
@@ -27,20 +30,28 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
     #endregion
     
     #region Health
-        private Text textHealth;
         const float maxHealth = 100f;
         float currentHealth = maxHealth;
     #endregion
+    
+    #region HUD
+    
+        private Text textHealth;
+    
+        private Text ui_username;
+        public TextMeshPro playerUsername;
 
+    #endregion
+    
+    
     Rigidbody rb;
     PhotonView PV;
     PlayerManager playerManager;
     GameManager _gameManager;
 
-    private Text ui_username;
+    
 
     [HideInInspector] public ProfileData playerProfile;
-    public TextMeshPro playerUsername;
 
     public bool EscapeMod => _gameManager.EscapeMod;
     
@@ -119,20 +130,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
         playerUsername.text = playerProfile.username;
     }
 
-    void UseItem() //utiliser les items (souvent gun)
-    {
-        for (int i = 0; i < items.Length; i++)
-        {
-            if (Input.GetKeyDown((i + 1).ToString()))
-            {
-                EquipItem(i);
-                break;
-            }
-        }
-
-        if (Input.GetMouseButtonDown(0))
-            items[itemIndex].Use();
-    }
+    
 
     #region Physics Method
     
@@ -169,6 +167,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
     }
 
     #endregion
+
+    #region Items Method
     void EquipItem(int _index)
     {
         if (_index == previousItemIndex)
@@ -192,10 +192,24 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
 			PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
 		}
     }
+    void UseItem() //utiliser les items (souvent gun)
+    {
+        for (int i = 0; i < items.Length; i++)
+        {
+            if (Input.GetKeyDown((i + 1).ToString()))
+            {
+                EquipItem(i);
+                break;
+            }
+        }
 
+        if (Input.GetMouseButtonDown(0))
+            items[itemIndex].Use();
+    }
+    #endregion
 	public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
 	{
-		if (!PV.IsMine && targetPlayer == PV.Owner)
+		if (!PV.IsMine && targetPlayer == PV.Owner && changedProps.ContainsKey("itemIndex"))
 		{
 			EquipItem((int)changedProps["itemIndex"]);
 		}

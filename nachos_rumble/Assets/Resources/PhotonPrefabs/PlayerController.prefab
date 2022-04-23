@@ -283,6 +283,10 @@ MonoBehaviour:
   smoothTime: 0.15
   mouseSensitivity: 1
   playerUsername: {fileID: 3438173301111105418}
+  playerProfile:
+    username: DEFAULT USERNAME
+    level: 0
+    xp: 0
 --- !u!1 &1533647282149257372
 GameObject:
   m_ObjectHideFlags: 0

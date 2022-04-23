@@ -26,8 +26,8 @@ public class SingleShotGun : Gun
         ray.origin = cam.transform.position;
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            Debug.Log("SingeShotGun : Shoot() : RayCast the object :" + hit.collider.gameObject.ToString());
-            hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo) itemInfo).damage);
+            Debug.Log("SingeShotGun : Shoot() : RayCast the object :" + hit.collider.gameObject);
+            hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo) itemInfo).damage, PV.Owner);
             if (hit.collider.GetComponent<IDamageable>() is null)
             {
                 Debug.Log("SingleShotGun : Raycast hit an object that is not damageable.");
@@ -39,7 +39,7 @@ public class SingleShotGun : Gun
             PV.RPC("RPC_Shoot",RpcTarget.All, hit.point,hit.normal);
         }
     }
-
+    
     [PunRPC]
     void RPC_Shoot(Vector3 hitPosition, Vector3 hitNormal)
     {

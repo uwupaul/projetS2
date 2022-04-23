@@ -51,10 +51,4 @@ public class RoomManager : MonoBehaviourPunCallbacks
         PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "AIManager"), Vector3.zero,
             Quaternion.identity);
     }
-    
-    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
-    {
-        if (changedProps.ContainsKey("Deaths"))
-            Debug.Log($"{targetPlayer.NickName} died {(int)changedProps["Deaths"]} times.");
-    }
 }

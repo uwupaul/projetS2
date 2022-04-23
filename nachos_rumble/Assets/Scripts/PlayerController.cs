@@ -37,8 +37,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     #region HUD
     
         private Text textHealth;
-    
         private Text ui_username;
+        private Text ui_kills;
+        private Text ui_death;
+        
         public TextMeshPro playerUsername;
 
     #endregion
@@ -68,7 +70,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (PV.IsMine)
         {
             ui_username = GameObject.Find("Canvas/Username/UsernameText").GetComponent<Text>();
-
+            ui_kills = GameObject.Find("Canvas/Kills/KillsText").GetComponent<Text>();
+            ui_death = GameObject.Find("Canvas/Death/DeathText").GetComponent<Text>();
+            
             ui_username.text = Launcher.myProfile.username;
             
             photonView.RPC("SyncProfile",RpcTarget.All,Launcher.myProfile.username,Launcher.myProfile.level,Launcher.myProfile.xp);
@@ -213,23 +217,57 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 		{
 			EquipItem((int)changedProps["itemIndex"]);
 		}
-	}
 
-    public void TakeDamage(float damage)
+        if (changedProps.ContainsKey("Death"))
+        {
+            Debug.Log($"{targetPlayer.NickName} died {(int)changedProps["Death"]} times.");
+            
+            if (PV.IsMine && targetPlayer == PV.Owner)
+            {
+                //text death
+                ui_death.text = "DEATHS : " + Convert.ToString((int)changedProps["Death"]);
+            }
+        }
+        
+
+        if (changedProps.ContainsKey("Kills"))
+        {
+            Debug.Log($"{targetPlayer.NickName} has {(int) changedProps["Kills"]} kills. sam est raciste");
+
+            if (PV.IsMine && targetPlayer == PV.Owner)
+            {
+                //text kills
+                ui_kills.text = "KILLS : " + Convert.ToString((int)changedProps["Kills"]);
+            }
+        }
+    }
+
+    public void TakeDamage(float damage, Player opponent)
     {
-        PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
+        PV.RPC("RPC_TakeDamage", RpcTarget.All, damage, opponent);
     }
 
     [PunRPC]
-    void RPC_TakeDamage(float damage)
+    void RPC_TakeDamage(float damage, Player opponent)
     {
         if (!PV.IsMine)
             return;
         
         currentHealth -= damage;
-        
-        if (currentHealth <= 0)
+
+        if (currentHealth <= 0) {
+            ApplyKill(opponent);
             Die();
+        }
+    }
+
+    void ApplyKill(Player player)
+    {
+        Hashtable H = new Hashtable();
+        int deathOfParent = Convert.ToInt32(player.CustomProperties["Kills"]);
+        
+        H.Add("Kills", deathOfParent + 1);
+        player.SetCustomProperties(H);
     }
 
     void Die()

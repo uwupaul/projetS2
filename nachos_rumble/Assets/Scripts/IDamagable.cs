@@ -1,4 +1,6 @@
+using Photon.Realtime;
+
 public interface IDamageable
 {
-    void TakeDamage(float damage);
+    void TakeDamage(float damagen, Player opponent);
 }

@@ -47,7 +47,6 @@ public class AIController : MonoBehaviourPunCallbacks, IDamageable
         }
         else
         {
-            Destroy(GetComponentInChildren<Camera>().gameObject); // sert à quoi exactement?
             Destroy(rb);
         }
     }
@@ -86,9 +85,9 @@ public class AIController : MonoBehaviourPunCallbacks, IDamageable
         return bestTarget;
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, Player opponent)
     {
-        PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
+        PV.RPC("RPC_TakeDamage", RpcTarget.All, damage, opponent);
         Debug.Log($"AI took {damage} damage.");
     }
     

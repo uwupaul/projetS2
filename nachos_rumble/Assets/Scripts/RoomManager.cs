@@ -56,5 +56,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         if (changedProps.ContainsKey("Deaths"))
             Debug.Log($"{targetPlayer.NickName} died {(int)changedProps["Deaths"]} times.");
+        
+        if (changedProps.ContainsKey("Kills"))
+            Debug.Log($"{targetPlayer.NickName} has {(int)changedProps["Kills"]} kills. sam est raciste");
     }
 }

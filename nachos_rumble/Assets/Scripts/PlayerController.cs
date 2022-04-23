@@ -215,21 +215,32 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 		}
 	}
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, Player opponent)
     {
-        PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
+        PV.RPC("RPC_TakeDamage", RpcTarget.All, damage, opponent);
     }
 
     [PunRPC]
-    void RPC_TakeDamage(float damage)
+    void RPC_TakeDamage(float damage, Player opponent)
     {
         if (!PV.IsMine)
             return;
         
         currentHealth -= damage;
-        
-        if (currentHealth <= 0)
+
+        if (currentHealth <= 0) {
+            ApplyKill(opponent);
             Die();
+        }
+    }
+
+    void ApplyKill(Player player)
+    {
+        Hashtable H = new Hashtable();
+        int deathOfParent = Convert.ToInt32(player.CustomProperties["Kills"]);
+        
+        H.Add("Kills", deathOfParent + 1);
+        player.SetCustomProperties(H);
     }
 
     void Die()

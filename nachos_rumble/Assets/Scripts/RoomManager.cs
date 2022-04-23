@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.IO;
 using Photon.Realtime;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
@@ -15,11 +16,9 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         if (Instance && Instance != this)// verifie si une autre roomManager exists
         {
-            Debug.Log("y'a 2 room manager");
             Destroy(gameObject); // il ne peut y en avoir que un 
             return;
         }
-        Debug.Log("y'a qu'1 room manager");
         DontDestroyOnLoad(gameObject); // il est le seul.
         Instance = this;
     }
@@ -51,5 +50,11 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "AIManager"), Vector3.zero,
             Quaternion.identity);
+    }
+    
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        if (changedProps.ContainsKey("Deaths"))
+            Debug.Log($"{targetPlayer.NickName} died {(int)changedProps["Deaths"]} times.");
     }
 }

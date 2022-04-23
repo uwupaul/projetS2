@@ -1,11 +1,11 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
 using System.IO;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class PlayerManager : MonoBehaviour
+public class PlayerManager : MonoBehaviourPunCallbacks
 {
     PhotonView PV;
     GameObject controller;
@@ -33,5 +33,14 @@ public class PlayerManager : MonoBehaviour
     {
         PhotonNetwork.Destroy(controller);
         CreateController();
+        ApplyDeath();
+    }
+
+    void ApplyDeath()
+    {
+        Hashtable H = new Hashtable();
+        int deathsOfParent = Convert.ToInt32(PV.Owner.CustomProperties["Deaths"]);
+        H.Add("Deaths", deathsOfParent + 1);
+        PV.Owner.SetCustomProperties(H);
     }
 }

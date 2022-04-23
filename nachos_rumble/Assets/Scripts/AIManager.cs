@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using System.IO;
-using UnityEngine.AI;
 
 public class AIManager : MonoBehaviour
 {
@@ -18,14 +17,14 @@ public class AIManager : MonoBehaviour
     void Start()
     {
         if (PV.IsMine)
-            CreateController(); 
-        
+            CreateController();
     }
 
     void CreateController()
     {
         Transform spawnpoint = SpawnManager.Instance.GetSpawnPoint();
         controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs","AIController"),spawnpoint.position,spawnpoint.rotation, 0, new object[] { PV.ViewID });
+        Debug.Log("AIManager : CreateController()");
         
         //On va instantier le prefab 'AIController' qui se trouve dans le dossier 'PhotonPrefabs' à la position
         //et à la même rotation qu'un SpawnPoint choisi aléatoirement par 'GetSpawnPoint'
@@ -35,5 +34,6 @@ public class AIManager : MonoBehaviour
     {
         PhotonNetwork.Destroy(controller);
         CreateController();
+        Debug.Log("AIManager : Die()");
     }
 }

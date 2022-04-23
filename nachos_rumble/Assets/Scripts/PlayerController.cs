@@ -7,7 +7,7 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Photon.Realtime;
 using UnityEngine.UI;
 
-public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
+public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
     #region Items
         [SerializeField] Item[] items;
@@ -173,7 +173,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamagable
 
 	public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
 	{
-		if (!PV.IsMine && targetPlayer == PV.Owner)
+		if (!PV.IsMine && targetPlayer == PV.Owner && changedProps.ContainsKey("itemIndex"))
 		{
 			EquipItem((int)changedProps["itemIndex"]);
 		}

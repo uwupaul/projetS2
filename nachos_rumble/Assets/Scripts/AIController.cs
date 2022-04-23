@@ -9,21 +9,20 @@ using Photon.Pun;
 using UnityEngine.AI;
 using Vector3 = UnityEngine.Vector3;
 
-public class AIController : MonoBehaviour
+public class AIController : MonoBehaviourPunCallbacks, IDamageable
 {
     // Rôle du controller:
     //      - prendre des dégats et potentiellement mourir
     //      - donner des dégâts aux ennemis
     //      - se déplacer en cherchant l'ennemi (non-IA) le plus proche
-    //      - 
-    //      - 
     
-    
-    // Attention: ne pas prendre en compte les joueurs qui sont des IA!! -> créer des tags sur les gameObject?
+    // Problèmes à régler:
+    //      - l'IA se met à bugger dès qu'un joueur la touche -> pourquoi??
+    //      - l'IA ne peut pas monter les pentes (on dirait il faut essayer sur un autre map) -> pourquoi ??
+    //      - l'IA n'est pas détectée comme un gameobject -> on ne peut pas lui tirer dessus ? je comprends pas pourquoi
 
 
     #region Health
-        private Text textHealth;
         const float maxHealth = 100f;
         float currentHealth = maxHealth;
     #endregion
@@ -57,7 +56,9 @@ public class AIController : MonoBehaviour
     {
         // - trouver le gameObject avec le tag 'Player' le plus proche
         // demander à la navmesh de s'y rendre
-
+        
+        // FIX: set la destination du navMeshAgent dans une coroutine toute les 0.1 ou 0.2 secondes mais pas ici
+        
         if(!PV.IsMine)
             return;
         
@@ -68,38 +69,27 @@ public class AIController : MonoBehaviour
     {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         float minDistance = Single.PositiveInfinity;
-        Vector3 bestTarget = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+        Vector3 bestTarget = transform.position;
         // on set bestTarget comme la position même du Controller, comme ça si elle ne trouve pas de cible, elle ne bouge pas
         
         foreach (GameObject p in players)
         {
-            Vector3 playerPos = new Vector3(p.transform.position.x, p.transform.position.y, p.transform.position.z);
-            float newDistance = EuclidianDistance(playerPos);
+            float newDistance = Vector3.Distance(transform.position, p.transform.position);
+            // changer ça pour pas faire qu'une ia s'arrête sans rien faire quand un joueur est au dessus d'elle 
             
             if (newDistance < minDistance) {
                 minDistance = newDistance;
-                bestTarget = playerPos;
+                bestTarget = p.transform.position;
             }
         }
 
         return bestTarget;
     }
 
-    float EuclidianDistance(Vector3 p)
-    {
-        // Retourne la distance euclidienne entre l'AIController et 'p'.
-        
-        Vector3 diff = new Vector3(
-            transform.position.x - p.x,
-            transform.position.y - p.y,
-            transform.position.z - p.z);
-
-        return (float) Math.Sqrt(Math.Pow(diff.x, 2f) + Math.Pow(diff.y, 2f) + Math.Pow(diff.z, 2f));
-    }
-
     public void TakeDamage(float damage)
     {
         PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
+        Debug.Log($"AI took {damage} damage.");
     }
     
     [PunRPC]
@@ -116,6 +106,7 @@ public class AIController : MonoBehaviour
 
     void Die()
     {
+        Debug.Log("AIController : Die()");
         aiManager.Die();
     }
 }

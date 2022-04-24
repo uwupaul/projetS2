@@ -42,7 +42,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
                 Quaternion.identity);
             // on instancie le playerManager qui nous servira à instantier le playerController et à le gérer, etc.
             
-            InstantiateAI(); // fait spawn une IA (par personne?)
+            //InstantiateAI(); // fait spawn une IA (par personne?)
         }
     }
 

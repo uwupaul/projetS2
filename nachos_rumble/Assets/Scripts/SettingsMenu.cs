@@ -12,13 +12,9 @@ public class SettingsMenu : MonoBehaviour
     PlayerController PC;
     [SerializeField] Slider masterVolumeSlider;
     [SerializeField] Slider mouseSensitivitySlider;
-    [SerializeField] GameManager _gameManager;
+    [SerializeField] UIManager UIM;
 
-    bool _EscapeMod
-    {
-        get => _gameManager.EscapeMod;
-        set => _gameManager.EscapeMod = value;
-    }
+    bool _EscapeMod { get; set; }
 
     private void Awake()
     {

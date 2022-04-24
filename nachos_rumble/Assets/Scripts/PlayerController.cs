@@ -49,20 +49,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     Rigidbody rb;
     PhotonView PV;
     PlayerManager playerManager;
-    GameManager _gameManager;
+    UIManager UIM;
 
     
 
     [HideInInspector] public ProfileData playerProfile;
 
-    public bool EscapeMod => _gameManager.EscapeMod;
+    public bool EscapeMod => UIM.EscapeMod;
     
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         PV = GetComponent<PhotonView>();
         playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
-        _gameManager = FindObjectOfType<GameManager>();
+        UIM = FindObjectOfType<UIManager>();
     }
 
     void Start()

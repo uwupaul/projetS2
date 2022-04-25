@@ -20,8 +20,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     #region Physics
         [SerializeField] GameObject cameraHolder;
         [SerializeField] float sprintSpeed, walkSpeed, jumpForce, smoothTime;
-        
-        public float mouseSensitivity;
+
+        //public float mouseSensitivity; => UIManager.Instance.GetComponent<SettingsMenu>().mouseSensitivity;
         
         float verticalLookRotation;
         bool grounded;
@@ -37,8 +37,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     #region HUD
     
         private Text textHealth;
-    
         private Text ui_username;
+        private Text ui_kills;
+        private Text ui_death;
+        
         public TextMeshPro playerUsername;
 
     #endregion
@@ -47,20 +49,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     Rigidbody rb;
     PhotonView PV;
     PlayerManager playerManager;
-    GameManager _gameManager;
-
+    UIManager UIM;
+    bool EscapeMod => UIM.EscapeMod;
+    float mouseSensitivity => UIM.settingsMenu.mouseSensitivity;
     
-
     [HideInInspector] public ProfileData playerProfile;
 
-    public bool EscapeMod => _gameManager.EscapeMod;
+    
     
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         PV = GetComponent<PhotonView>();
         playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
-        _gameManager = FindObjectOfType<GameManager>();
+        UIM = playerManager.GetComponentInChildren<UIManager>();
     }
 
     void Start()
@@ -68,7 +70,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (PV.IsMine)
         {
             ui_username = GameObject.Find("Canvas/Username/UsernameText").GetComponent<Text>();
-
+            ui_kills = GameObject.Find("Canvas/Kills/KillsText").GetComponent<Text>();
+            ui_death = GameObject.Find("Canvas/Death/DeathText").GetComponent<Text>();
+            
             ui_username.text = Launcher.myProfile.username;
             
             photonView.RPC("SyncProfile",RpcTarget.All,Launcher.myProfile.username,Launcher.myProfile.level,Launcher.myProfile.xp);
@@ -213,7 +217,30 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 		{
 			EquipItem((int)changedProps["itemIndex"]);
 		}
-	}
+
+        if (changedProps.ContainsKey("Death"))
+        {
+            Debug.Log($"{targetPlayer.NickName} died {(int)changedProps["Death"]} times.");
+            
+            if (PV.IsMine && targetPlayer == PV.Owner)
+            {
+                //text death
+                ui_death.text = "DEATHS : " + Convert.ToString((int)changedProps["Death"]);
+            }
+        }
+        
+
+        if (changedProps.ContainsKey("Kills"))
+        {
+            Debug.Log($"{targetPlayer.NickName} has {(int) changedProps["Kills"]} kills. sam est raciste");
+
+            if (PV.IsMine && targetPlayer == PV.Owner)
+            {
+                //text kills
+                ui_kills.text = "KILLS : " + Convert.ToString((int)changedProps["Kills"]);
+            }
+        }
+    }
 
     public void TakeDamage(float damage, Player opponent)
     {

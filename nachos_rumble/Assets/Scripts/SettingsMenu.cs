@@ -5,63 +5,75 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 using Photon.Pun;
+using Photon.Realtime;
 
-public class SettingsMenu : MonoBehaviour
+public class SettingsMenu : MonoBehaviourPunCallbacks
 {
     public AudioMixer audioMixer;
-    PlayerController PC;
     [SerializeField] Slider masterVolumeSlider;
     [SerializeField] Slider mouseSensitivitySlider;
-    [SerializeField] GameManager _gameManager;
+    public float mouseSensitivity;
 
     bool _EscapeMod
     {
-        get => _gameManager.EscapeMod;
-        set => _gameManager.EscapeMod = value;
+        get => UIManager.Instance.EscapeMod;
+        set => UIManager.Instance.EscapeMod = value;
     }
 
     private void Awake()
     {
-        PC = FindObjectOfType<PlayerController>();
-
         float masterVolume;
         audioMixer.GetFloat("MasterVolume",out masterVolume);
-
+        
         masterVolumeSlider.value = masterVolume;
-        mouseSensitivitySlider.value = PC.mouseSensitivity;
+        mouseSensitivity = 1;
+        mouseSensitivitySlider.value = mouseSensitivity;
     }
 
     public void Toggle()
     {
+        Debug.Log("settings menu : toggle");
+        
         gameObject.SetActive(!gameObject.activeSelf);
         _EscapeMod = !_EscapeMod;
+
+        Debug.Log("settings menu : toggle" + _EscapeMod + gameObject.activeSelf);
         
         if (_EscapeMod)
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
+            EnableMouse();
         else
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
+            DisableMouse();
+    }
+
+    public static void EnableMouse()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    public static void DisableMouse()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void SetMasterVolume(float volume)
     {
         audioMixer.SetFloat("MasterVolume", volume);
+        Debug.Log($"SettingsMenu : SetMasterVolume to {volume}");
     }
 
     public void SetQuality(int qualityIndex)
     {
         QualitySettings.SetQualityLevel(qualityIndex);
+        Debug.Log($"SettingsMenu : SetQuality to {qualityIndex}");
     }
     
     
     public void SetMouseSensitivity(float sens)
     {
-        PC.mouseSensitivity = sens;
+        mouseSensitivity = sens;
+        Debug.Log($"SettingsMenu : SetMouseSensitivity to {sens}");
     }
 
     public void QuitGame()
@@ -71,6 +83,7 @@ public class SettingsMenu : MonoBehaviour
     
     public void QuitRoom()
     {
+        Debug.Log($"SettingsMenu : QuitRoom");
         Destroy(RoomManager.Instance.gameObject);
         PhotonNetwork.LeaveRoom();
     }

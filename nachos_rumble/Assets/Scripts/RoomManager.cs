@@ -42,7 +42,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
                 Quaternion.identity);
             // on instancie le playerManager qui nous servira à instantier le playerController et à le gérer, etc.
             
-            InstantiateAI(); // fait spawn une IA (par personne?)
+            //InstantiateAI(); // fait spawn une IA (par personne?)
         }
     }
 
@@ -50,14 +50,5 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "AIManager"), Vector3.zero,
             Quaternion.identity);
-    }
-    
-    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
-    {
-        if (changedProps.ContainsKey("Deaths"))
-            Debug.Log($"{targetPlayer.NickName} died {(int)changedProps["Deaths"]} times.");
-        
-        if (changedProps.ContainsKey("Kills"))
-            Debug.Log($"{targetPlayer.NickName} has {(int)changedProps["Kills"]} kills. sam est raciste");
     }
 }

@@ -232,7 +232,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         if (changedProps.ContainsKey("Kills"))
         {
-            Debug.Log($"{targetPlayer.NickName} has {(int) changedProps["Kills"]} kills. sam est raciste");
+            Debug.Log($"{targetPlayer.NickName} has {(int) changedProps["Kills"]} kills.");
 
             if (PV.IsMine && targetPlayer == PV.Owner)
             {

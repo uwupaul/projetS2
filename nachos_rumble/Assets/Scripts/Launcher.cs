@@ -34,6 +34,8 @@ public class Launcher : MonoBehaviourPunCallbacks
 {
     public InputField usernameField;
     public static ProfileData myProfile = new ProfileData();
+
+    private PhotonView PV;
     
     public static Launcher launcher;
 
@@ -111,6 +113,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         {
             myProfile.username = usernameField.text;
         }
+        
         Data.SaveProfile(myProfile); // save le profile
 
         foreach (Transform child in playerListContent)

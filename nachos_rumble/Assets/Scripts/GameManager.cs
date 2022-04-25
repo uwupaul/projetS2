@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
@@ -8,7 +9,7 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class GameManager : MonoBehaviourPunCallbacks
 {
     PhotonView PV;
-    public int scoreToWin = 20;
+    public int scoreToWin = 10;
     Player GameWinner;
     public static GameManager Instance;
 
@@ -31,15 +32,27 @@ public class GameManager : MonoBehaviourPunCallbacks
         
         if (changedProps.ContainsKey("Kills"))
         {
+            Debug.Log($"{targetPlayer} has {(int)changedProps["Kills"]} eliminations.");
+            
             if ((int) changedProps["Kills"] >= scoreToWin)
             {
                 GameWinner = targetPlayer;
-                StartCoroutine("EndGame");
+                PV.RPC("RPC_EndGame", RpcTarget.All, GameWinner);
             }
         }
+        
+        if (changedProps.ContainsKey("Deaths"))
+            Debug.Log($"{targetPlayer} has {(int)changedProps["Deaths"]} deaths.");
     }
-    
-    IEnumerator EndGame()
+
+    [PunRPC]
+    void RPC_EndGame(Player winner)
+    {
+        StartCoroutine(EndGame(winner)); 
+    }
+
+
+    IEnumerator EndGame(Player winner)
     {
         // faire un écran de fin de partie donnant le nom du vainqueur de la partie
         // attendre 10 secondes puis faire que tlm quitte la game avec une fonction RPC lancée uniquement par le master de la room
@@ -47,20 +60,20 @@ public class GameManager : MonoBehaviourPunCallbacks
         
         //faire que les joueurs ne peuvent plus ni bouger ni tirer, etc
 
-        DisplayEndScreen();
+        DisplayEndScreen(winner);
 
         for (int i = 5; i > 0; i--)
         {
             Debug.Log($"Fin de la partie dans : {i}..");
             yield return new WaitForSecondsRealtime(1);
         }
-        
+
         QuitRoom();
     }
 
-    void DisplayEndScreen()
+    void DisplayEndScreen(Player winner)
     {
-        Debug.Log($"{GameWinner.NickName} has won the game !!");
+        Debug.Log($"{winner} has won the game !!");
     }
     
     void QuitRoom()
@@ -68,5 +81,13 @@ public class GameManager : MonoBehaviourPunCallbacks
         Destroy(RoomManager.Instance.gameObject);
         PhotonNetwork.LeaveRoom();
         // il faut remettre la souris et le curseur
+    }
+    
+    public override void OnLeftRoom()
+    {
+        Debug.Log($"SetingsMenu : OnLeftRoom");
+        SettingsMenu.EnableMouse();
+        PhotonNetwork.LoadLevel(0);
+        Destroy(gameObject);
     }
 }

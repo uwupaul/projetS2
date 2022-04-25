@@ -44,6 +44,7 @@ MonoBehaviour:
   - SyncProfile
   - RPC_DisplayEndScreen
   - RPC_QuitRoom
+  - RPC_EndGame
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

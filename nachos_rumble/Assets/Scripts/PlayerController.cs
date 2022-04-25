@@ -20,8 +20,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     #region Physics
         [SerializeField] GameObject cameraHolder;
         [SerializeField] float sprintSpeed, walkSpeed, jumpForce, smoothTime;
-        
-        public float mouseSensitivity;
+
+        //public float mouseSensitivity; => UIManager.Instance.GetComponent<SettingsMenu>().mouseSensitivity;
         
         float verticalLookRotation;
         bool grounded;
@@ -50,19 +50,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     PhotonView PV;
     PlayerManager playerManager;
     UIManager UIM;
-
+    bool EscapeMod => UIM.EscapeMod;
+    float mouseSensitivity => UIM.settingsMenu.mouseSensitivity;
     
-
     [HideInInspector] public ProfileData playerProfile;
 
-    public bool EscapeMod => UIM.EscapeMod;
+    
     
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         PV = GetComponent<PhotonView>();
         playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
-        UIM = FindObjectOfType<UIManager>();
+        UIM = playerManager.GetComponentInChildren<UIManager>();
     }
 
     void Start()

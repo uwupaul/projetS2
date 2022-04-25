@@ -6,23 +6,28 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviourPunCallbacks
 {
-    [SerializeField] SettingsMenu settingsMenu;
+    [SerializeField] public SettingsMenu settingsMenu;
     public bool EscapeMod;
-    // UTILISER UNE INSTANCE PUBLIC ET STATIC POUR FAIRE CE QU'ON VEUT????
+    
+    public static UIManager Instance;
     
     private void Awake()
     {
+        if (Instance && Instance != this)// verifie si une autre roomManager exists
+        {
+            Destroy(gameObject); // il ne peut y en avoir que un 
+            return;
+        }
+        Instance = this;
         EscapeMod = false;
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Debug.Log("Escape pressed in UIManager");
             settingsMenu.Toggle();
-    }
-
-    public override void OnLeftRoom()
-    {
-        PhotonNetwork.LoadLevel(0);
+        }
     }
 }

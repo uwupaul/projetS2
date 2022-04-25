@@ -13,6 +13,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
+        PV.Owner.CustomProperties["Kills"] = 0;
+        PV.Owner.CustomProperties["Deaths"] = 0;
     }
 
     void Start()
@@ -25,6 +27,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
     void CreateController()
     {
+        Debug.Log("trucccc");
         Transform spawnpoint = SpawnManager.Instance.GetSpawnPoint();
         controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs","PlayerController"),spawnpoint.position,spawnpoint.rotation, 0, new object[] { PV.ViewID });
     }

@@ -157,6 +157,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scoreToWin: 20
+  EndScreen: {fileID: 0}
+  TitleText: {fileID: 0}
+  subTitleText: {fileID: 0}
 --- !u!114 &5372232299650759224
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,7 +240,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 2
   m_TargetDisplay: 0
 --- !u!114 &4766183156478680402
 MonoBehaviour:

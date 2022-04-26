@@ -78,6 +78,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             photonView.RPC("SyncProfile",RpcTarget.All,Launcher.myProfile.username,Launcher.myProfile.level,Launcher.myProfile.xp);
 
             EquipItem(0);
+            
+            if (!EscapeMod)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
         }
         else
         {
@@ -87,16 +98,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         
         textHealth = GameObject.Find("TextHealth").GetComponent<Text>();
         
-        if (!EscapeMod)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
-        else
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
+        
     }
 
     void Update()

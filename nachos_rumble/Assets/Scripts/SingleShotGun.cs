@@ -40,7 +40,8 @@ public class SingleShotGun : Gun
         {
             Debug.Log("SingeShotGun : Shoot() : RayCast the object :" + hit.collider.gameObject);
             hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo) itemInfo).damage, PV.Owner);
-            PV.RPC("RPC_Shoot",RpcTarget.All, hit.point,hit.normal);
+            if (!hit.collider.gameObject.GetComponent<PlayerGroundCheck>())
+                PV.RPC("RPC_Shoot",RpcTarget.All, hit.point,hit.normal);
         }
 
         var timeToWait = 1 / ((GunInfo) itemInfo).shotsPerSeconds;

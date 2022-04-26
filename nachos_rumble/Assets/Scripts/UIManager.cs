@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class UIManager : MonoBehaviourPunCallbacks
 {
@@ -29,5 +30,14 @@ public class UIManager : MonoBehaviourPunCallbacks
             Debug.Log("Escape pressed in UIManager");
             settingsMenu.Toggle();
         }
+    }
+
+    public void HitEffect()
+    {
+        // dès qu'on prend des dégâts -> l'écran devient rouge
+        // reprendre des dégâts allonge le temps pendant lequel l'écran sera rouge
+        // mais n'influe pas sur 'l'animation'
+
+        // rajouter l'effet de coloration rouge de l'écran
     }
 }

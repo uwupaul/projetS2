@@ -83,7 +83,7 @@ GameObject:
   - component: {fileID: 8405436757506428678}
   - component: {fileID: 692112230081091170}
   - component: {fileID: 5092477754037763301}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -180,7 +180,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 769711041724897928}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RifleObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -215,7 +215,7 @@ GameObject:
   - component: {fileID: 5019221044995275542}
   - component: {fileID: 9130013368419085926}
   - component: {fileID: 6387459675397686194}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -478,6 +478,7 @@ MonoBehaviour:
   - {fileID: 5187640237091012822}
   - {fileID: 6682682439688860012}
   cameraHolder: {fileID: 1810719947681551406}
+  cam: {fileID: 7728233135177745310}
   sprintSpeed: 4.5
   walkSpeed: 3
   jumpForce: 250
@@ -766,9 +767,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5548355497010380147}
+  - component: {fileID: 8803739695368015595}
   m_Layer: 0
   m_Name: CameraHolder
-  m_TagString: Untagged
+  m_TagString: Camera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -789,6 +791,28 @@ Transform:
   m_Father: {fileID: 4118048167697358159}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8803739695368015595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1810719947681551406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1849547713923852241
 GameObject:
   m_ObjectHideFlags: 0
@@ -933,7 +957,7 @@ GameObject:
   - component: {fileID: 7951970103424558519}
   m_Layer: 6
   m_Name: WeaponCamera
-  m_TagString: Untagged
+  m_TagString: Camera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -976,7 +1000,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.01
-  far clip plane: 1000
+  far clip plane: 300
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -1006,7 +1030,7 @@ GameObject:
   - component: {fileID: 1362800496345928662}
   - component: {fileID: 8408703935705183698}
   - component: {fileID: 8793865006314851157}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1081,7 +1105,7 @@ GameObject:
   - component: {fileID: 3028187812027546311}
   - component: {fileID: 8632691187817684323}
   - component: {fileID: 2403984278094867352}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1191,7 +1215,7 @@ GameObject:
   - component: {fileID: 1463219985413571389}
   m_Layer: 6
   m_Name: Camera
-  m_TagString: Untagged
+  m_TagString: Camera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1402,13 +1426,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2027115162905102832}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PistolObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2027115162905102832
 Transform:
   m_ObjectHideFlags: 0

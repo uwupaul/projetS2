@@ -7,6 +7,7 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Photon.Realtime;
 using UnityEngine.UI;
 using TMPro;
+using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
@@ -19,10 +20,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     #region Physics
         [SerializeField] GameObject cameraHolder;
+        [SerializeField] GameObject cam;
         [SerializeField] float sprintSpeed, walkSpeed, jumpForce, smoothTime;
 
-        //public float mouseSensitivity; => UIManager.Instance.GetComponent<SettingsMenu>().mouseSensitivity;
-        
         float verticalLookRotation;
         bool grounded;
         Vector3 smoothMoveVelocity;
@@ -49,9 +49,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     Rigidbody rb;
     PhotonView PV;
     PlayerManager playerManager;
+    
+    #region UI
     UIManager UIM;
     bool EscapeMod => UIM.EscapeMod;
     float mouseSensitivity => UIM.settingsMenu.mouseSensitivity;
+    #endregion
     
     [HideInInspector] public ProfileData playerProfile;
 
@@ -127,6 +130,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if(!PV.IsMine)
             return;
         rb.MovePosition(rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
+        //Debug.Log(moveAmount.x + moveAmount.y + moveAmount.z);
     }
     
     [PunRPC]
@@ -175,6 +179,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     #endregion
 
     #region Items Method
+    
+    void ChangeLayersRecursively(Transform trans, string name)
+    {
+        foreach (Transform child in trans)
+        {
+            child.gameObject.layer = LayerMask.NameToLayer(name);
+            ChangeLayersRecursively(child, name);
+        }
+    }
+    
     void EquipItem(int _index)
     {
         if (_index == previousItemIndex)
@@ -184,6 +198,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         itemIndex = _index;
         items[itemIndex].itemGameObject.SetActive(true);
 
+        if (!PV.IsMine)
+        {
+            Debug.Log("changement de layer pour l'item");
+            items[itemIndex].itemGameObject.layer = LayerMask.NameToLayer("Default");
+            ChangeLayersRecursively(items[itemIndex].itemGameObject.transform, "Default");
+            //items[itemIndex].itemGameObject.layer = LayerMask.NameToLayer("Default");
+        }
+        
         if (previousItemIndex != -1)
         {
             items[previousItemIndex].itemGameObject.SetActive(false);
@@ -261,6 +283,26 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             ApplyKill(opponent);
             Die();
         }
+        else
+        {
+            UIManager.Instance.HitEffect(); // pour l'instant ne fait rien
+            StartCoroutine(ShakeCamera(0.02f));
+        }
+    }
+    
+    IEnumerator ShakeCamera(float duration)
+    {
+        Debug.Log("ShakeCamera Coroutine started");
+        Vector3 startPosition =  cam.transform.position;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration) {
+            elapsedTime += Time.deltaTime;
+            cam.transform.position = startPosition + Random.insideUnitSphere * 0.02f;
+            yield return null;
+        }
+
+        cam.transform.position = startPosition;
     }
 
     void ApplyKill(Player player)

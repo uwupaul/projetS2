@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         PV = GetComponent<PhotonView>();
 
         QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = 120;
+        Application.targetFrameRate = 60;
     }
     
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
@@ -99,7 +99,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         PhotonNetwork.LoadLevel(0);
         Debug.Log($"SetingsMenu : OnLeftRoom");
         SettingsMenu.EnableMouse();
-        
-        //Destroy(gameObject);
+        Destroy(gameObject);
     }
 }

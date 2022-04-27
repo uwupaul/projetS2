@@ -30,8 +30,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     #endregion
     
     #region Health
-        const float maxHealth = 100f;
-        float currentHealth = maxHealth;
+        const float MaxHealth = 100f;
+        public float currentHealth = MaxHealth;
+        private HealthBar HealthBar;
     #endregion
     
     #region HUD
@@ -100,8 +101,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
         
         textHealth = GameObject.Find("TextHealth").GetComponent<Text>();
+        HealthBar = GameObject.Find("HealthBar").GetComponent<HealthBar>();
         
-        
+        HealthBar.SetMaxHealth(MaxHealth);
     }
 
     void Update()
@@ -278,6 +280,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             return;
         
         currentHealth -= damage;
+        HealthBar.SetHealth(currentHealth);
 
         if (currentHealth <= 0) {
             ApplyKill(opponent);

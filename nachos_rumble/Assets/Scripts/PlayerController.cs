@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using Photon.Pun;
 using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
@@ -25,6 +26,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         float verticalLookRotation;
         bool grounded;
+        private bool previousGrounded;
         Vector3 smoothMoveVelocity;
         Vector3 moveAmount;
     #endregion
@@ -45,7 +47,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         public TextMeshPro playerUsername;
 
     #endregion
-
+    
     Rigidbody rb;
     PhotonView PV;
     PlayerManager playerManager;
@@ -101,7 +103,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         
         textHealth = GameObject.Find("TextHealth").GetComponent<Text>();
         HealthBar = GameObject.Find("HealthBar").GetComponent<HealthBar>();
-        
+
+        textHealth.text = MaxHealth.ToString(CultureInfo.CurrentCulture);
+        textHealth.color = Color.white;
         HealthBar.SetMaxHealth(MaxHealth);
     }
 
@@ -109,8 +113,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         if(!PV.IsMine)
             return;
-        
-        textHealth.text = currentHealth + "";
         
         if (EscapeMod)
         {
@@ -121,6 +123,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             Look(); Move(); Jump(); UseItem();
         }
+        
+        
 
         if (transform.position.y < -10f)
             Die();
@@ -278,10 +282,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             return;
         
         currentHealth -= damage;
+        
+        textHealth.text = currentHealth + "";
+
+        if (currentHealth <= 10)
+        {
+            textHealth.color = Color.red;
+        }
+        
         HealthBar.SetHealth(currentHealth);
 
         if (currentHealth <= 0) {
-            ApplyKill(opponent);
+            if (opponent != null)
+            {
+                ApplyKill(opponent);
+            }
             Die();
         }
         else

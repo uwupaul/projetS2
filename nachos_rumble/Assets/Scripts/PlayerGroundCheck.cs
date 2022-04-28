@@ -6,6 +6,11 @@ public class PlayerGroundCheck : MonoBehaviour
 {
     PlayerController playerController;
 
+    public Vector3 enterPos;
+    public Vector3 exitPos;
+
+    public int damageOnFall = 3;
+    public int heightFallDmg = 5;
     private void Awake()
     {
         playerController = GetComponentInParent<PlayerController>();
@@ -13,6 +18,13 @@ public class PlayerGroundCheck : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        enterPos = transform.position;
+
+        if (exitPos.y - enterPos.y > heightFallDmg)
+        { 
+            playerController.TakeDamage(damageOnFall * Convert.ToInt32(exitPos.y - enterPos.y), null);
+        }
+        
         if (other.gameObject == playerController.gameObject)
         {return;}
         playerController.SetGroundedState(true);
@@ -20,6 +32,8 @@ public class PlayerGroundCheck : MonoBehaviour
     
     void OnTriggerExit(Collider other)
     {
+        exitPos = transform.position;
+
         if (other.gameObject == playerController.gameObject)
         {return;}
         playerController.SetGroundedState(false);

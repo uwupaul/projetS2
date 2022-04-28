@@ -124,13 +124,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         if (transform.position.y < -10f)
             Die();
+
+        rb.transform.position = Vector3.Lerp(rb.transform.position, rb.position + rb.transform.TransformDirection(moveAmount), Time.deltaTime * 0.7f);
     }
     
     private void FixedUpdate()
     {
         if(!PV.IsMine)
             return;
-        rb.MovePosition(rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
+
+        //rb.MovePosition(rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
         //Debug.Log(moveAmount.x + moveAmount.y + moveAmount.z);
     }
     
@@ -156,9 +159,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     void Jump()
     {
         if (Input.GetKeyDown(KeyCode.Space) && grounded)
-        {
             rb.AddForce(transform.up * jumpForce);
-        }
     }
 
     void Look()
@@ -198,12 +199,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
         itemIndex = _index;
         items[itemIndex].itemGameObject.SetActive(true);
-
-        if (!PV.IsMine)
-        {
-            Debug.Log("changement de layer pour l'item");
-            items[itemIndex].itemGameObject.layer = LayerMask.NameToLayer("Default");
-        }
         
         if (previousItemIndex != -1)
         {
@@ -220,6 +215,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             ChangeLayersRecursively(items[itemIndex].itemGameObject.transform, "Weapons");
 		}
     }
+
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        // pour faire apparaître les armes de chaque joueur lorsqu'un nouveau joueur rentre dans la partie
+        
+        if (PV.Owner != newPlayer)
+            EquipItem((int)PV.Owner.CustomProperties["itemIndex"]);
+    }
+
     void UseItem() //utiliser les items (souvent gun)
     {
         for (int i = 0; i < items.Length; i++)
@@ -287,23 +291,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         else
         {
             UIManager.Instance.HitEffect(); // pour l'instant ne fait rien
-            StartCoroutine(ShakeCamera(0.02f));
+            StartCoroutine(cam.GetComponent<CameraEffect>().ShakeCamera(0.03f));
         }
-    }
-    
-    IEnumerator ShakeCamera(float duration)
-    {
-        Debug.Log("ShakeCamera Coroutine started");
-        Vector3 startPosition =  cam.transform.position;
-        float elapsedTime = 0f;
-
-        while (elapsedTime < duration) {
-            elapsedTime += Time.deltaTime;
-            cam.transform.position = startPosition + Random.insideUnitSphere * 0.02f;
-            yield return null;
-        }
-
-        cam.transform.position = startPosition;
     }
 
     void ApplyKill(Player player)

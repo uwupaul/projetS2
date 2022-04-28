@@ -28,13 +28,13 @@ public class GameManager : MonoBehaviourPunCallbacks
             Destroy(gameObject); // il ne peut y en avoir que un 
             return;
         }
-        DontDestroyOnLoad(gameObject); // il est le seul.
+        //DontDestroyOnLoad(gameObject); // il est le seul.
         Instance = this;
         
         PV = GetComponent<PhotonView>();
 
         QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = 240;
     }
     
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)

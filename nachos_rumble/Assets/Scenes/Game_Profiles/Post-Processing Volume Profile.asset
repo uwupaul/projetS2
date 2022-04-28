@@ -129,16 +129,16 @@ MonoBehaviour:
     value: 0
   saturation:
     overrideState: 1
-    value: 4
+    value: 3
   brightness:
     overrideState: 0
     value: 0
   postExposure:
     overrideState: 1
-    value: 0.2
+    value: 0.5
   contrast:
     overrideState: 1
-    value: 4
+    value: 3
   mixerRedOutRedIn:
     overrideState: 0
     value: 100
@@ -171,7 +171,7 @@ MonoBehaviour:
     value: {x: 1, y: 0.83613646, z: 0.7916804, w: 0}
   gamma:
     overrideState: 1
-    value: {x: 0.99076545, y: 1, z: 0.9999995, w: 0.14593457}
+    value: {x: 0.99076545, y: 1, z: 0.9999995, w: 0.13384998}
   gain:
     overrideState: 0
     value: {x: 1, y: 0.94767624, z: 0.9476756, w: 0}

@@ -44,8 +44,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         public TextMeshPro playerUsername;
 
     #endregion
-    
-    
+
     Rigidbody rb;
     PhotonView PV;
     PlayerManager playerManager;
@@ -100,8 +99,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
         
         textHealth = GameObject.Find("TextHealth").GetComponent<Text>();
-        
-        
     }
 
     void Update()
@@ -120,7 +117,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             Look(); Move(); Jump(); UseItem();
         }
-        
+
         if (transform.position.y < -10f)
             Die();
     }
@@ -166,7 +163,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         verticalLookRotation += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
         verticalLookRotation = Mathf.Clamp(verticalLookRotation, -90f, 90f);
-
+        
         cameraHolder.transform.localEulerAngles = Vector3.left * verticalLookRotation;
     }
     
@@ -202,8 +199,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             Debug.Log("changement de layer pour l'item");
             items[itemIndex].itemGameObject.layer = LayerMask.NameToLayer("Default");
-            ChangeLayersRecursively(items[itemIndex].itemGameObject.transform, "Default");
-            //items[itemIndex].itemGameObject.layer = LayerMask.NameToLayer("Default");
         }
         
         if (previousItemIndex != -1)
@@ -218,6 +213,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 			Hashtable hash = new Hashtable();
 			hash.Add("itemIndex", itemIndex);
 			PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+            ChangeLayersRecursively(items[itemIndex].itemGameObject.transform, "Weapons");
 		}
     }
     void UseItem() //utiliser les items (souvent gun)

@@ -145,9 +145,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     }
 
     [PunRPC]
-    private void SyncProfile(string p_username, int p_level,int p_xp) //profile de chq player (username in game)
+    private void SyncProfile(string p_username, int p_level, int p_xp, int p_globalKills, int p_globalDeaths) //profile de chq player (username in game)
     {
-        playerProfile = new ProfileData(p_username,p_level,p_xp);
+        playerProfile = new ProfileData(p_username,p_level,p_xp,p_globalKills,p_globalDeaths);
         playerUsername.text = playerProfile.username;
     }
     
@@ -262,8 +262,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             
             if (targetPlayer == PV.Owner)
             {
-                //deaths number text
+                Launcher.myProfile.globalDeath += 1;
+                //text death
                 ui_death.text = "DEATHS : " + Convert.ToString((int)changedProps["Death"]);
+                
             }
         }
 
@@ -273,7 +275,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
             if (targetPlayer == PV.Owner)
             {
-                //kills number text
+                Launcher.myProfile.globalKill += 1;
+                //text kills
                 ui_kills.text = "KILLS : " + Convert.ToString((int)changedProps["Kills"]);
             }
         }

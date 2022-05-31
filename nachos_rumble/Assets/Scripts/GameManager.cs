@@ -6,6 +6,7 @@ using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using PlayerData;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -68,6 +69,10 @@ public class GameManager : MonoBehaviourPunCallbacks
     IEnumerator EndGame(Player winner)
     {
         DisplayEndScreen(winner);
+        
+        Debug.Log(Launcher.myProfile.globalDeath);
+        Debug.Log(Launcher.myProfile.globalKill);
+        Data.SaveProfile(Launcher.myProfile);
 
         for (int i = 8; i > 0; i--)
         {

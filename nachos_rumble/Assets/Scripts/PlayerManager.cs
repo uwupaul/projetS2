@@ -21,7 +21,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     {
         if (PV.IsMine)
         {
-            CreateController(); 
+            CreateController();
         }
     }
 

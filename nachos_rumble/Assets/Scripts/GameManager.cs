@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         PV = GetComponent<PhotonView>();
 
         QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = 240;
+        Application.targetFrameRate = 120;
     }
     
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)

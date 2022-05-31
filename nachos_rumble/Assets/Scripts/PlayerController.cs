@@ -21,12 +21,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     #region Physics
         [SerializeField] GameObject cameraHolder;
         [SerializeField] GameObject cam;
-        [SerializeField] float sprintSpeed, walkSpeed, jumpForce, smoothTime;
+        [SerializeField] float sprintSpeed, walkSpeed, jumpForce;
 
         float verticalLookRotation;
         bool grounded;
         Vector3 smoothMoveVelocity;
         Vector3 moveAmount;
+
+        private float yaw = 0.0f, pitch = 0.0f;
     #endregion
     
     #region Health
@@ -37,10 +39,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     
     #region HUD
     
-        private Text textHealth;
-        private Text ui_username;
-        private Text ui_kills;
-        private Text ui_death;
+        private TextMeshProUGUI textHealth;
+        private TextMeshProUGUI ui_username;
+        private TextMeshProUGUI ui_kills;
+        private TextMeshProUGUI ui_death;
         
         public TextMeshPro playerUsername;
 
@@ -72,23 +74,24 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         if (PV.IsMine)
         {
-            ui_username = GameObject.Find("Canvas/Username/UsernameText").GetComponent<Text>();
-            ui_kills = GameObject.Find("Canvas/Kills/KillsText").GetComponent<Text>();
-            ui_death = GameObject.Find("Canvas/Death/DeathText").GetComponent<Text>();
+            ui_username = GameObject.Find("Canvas/BottomLeft/UsernameText").GetComponent<TextMeshProUGUI>();
+            ui_kills = GameObject.Find("Canvas/TopRight/KillsText").GetComponent<TextMeshProUGUI>();
+            ui_death = GameObject.Find("Canvas/TopRight/DeathText").GetComponent<TextMeshProUGUI>();
+            textHealth = GameObject.Find("Canvas/BottomLeft/TextHealth").GetComponent<TextMeshProUGUI>();
+            HealthBar = GameObject.Find("Canvas/BottomLeft/HealthBar").GetComponent<HealthBar>();
             
+            HealthBar.SetMaxHealth(MaxHealth);
             ui_username.text = Launcher.myProfile.username;
-            
+
             photonView.RPC("SyncProfile",RpcTarget.All,Launcher.myProfile.username,Launcher.myProfile.level,Launcher.myProfile.xp);
 
             EquipItem(0);
             
-            if (!EscapeMod)
-            {
+            if (!EscapeMod) {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
             }
-            else
-            {
+            else {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
             }
@@ -98,11 +101,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             Destroy(GetComponentInChildren<Camera>().gameObject);
             Destroy(rb);
         }
-        
-        textHealth = GameObject.Find("TextHealth").GetComponent<Text>();
-        HealthBar = GameObject.Find("HealthBar").GetComponent<HealthBar>();
-        
-        HealthBar.SetMaxHealth(MaxHealth);
     }
 
     void Update()
@@ -111,21 +109,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             return;
         
         textHealth.text = currentHealth + "";
+        // pas ouf de le mettre dans update vaut mieux le mettre quand on perd de la vie
         
-        if (EscapeMod)
+        if (!EscapeMod)
         {
-            moveAmount = Vector3.SmoothDamp(moveAmount,
-                new Vector3(0,0,0) * 0, ref smoothMoveVelocity, smoothTime);
-        }
-        else
-        {
-            Look(); Move(); Jump(); UseItem();
+            Look(); Jump(); UseItem();
+            //moveAmount = Vector3.SmoothDamp(moveAmount,
+            //    new Vector3(0,0,0) * 0, ref smoothMoveVelocity, smoothTime);
         }
 
-        if (transform.position.y < -10f)
+        if (transform.position.y < -5f)
             Die();
-
-        rb.transform.position = Vector3.Lerp(rb.transform.position, rb.position + rb.transform.TransformDirection(moveAmount), Time.deltaTime * 0.7f);
+        
+        Debug.Log(EscapeMod);
     }
     
     private void FixedUpdate()
@@ -133,8 +129,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if(!PV.IsMine)
             return;
 
-        //rb.MovePosition(rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
-        //Debug.Log(moveAmount.x + moveAmount.y + moveAmount.z);
+        if (!EscapeMod)
+            Move();
     }
     
     [PunRPC]
@@ -143,17 +139,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         playerProfile = new ProfileData(p_username,p_level,p_xp);
         playerUsername.text = playerProfile.username;
     }
-
     
 
     #region Physics Method
     
     void Move()
     {
-        Vector3 moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
-
-        moveAmount = Vector3.SmoothDamp(moveAmount,
-            moveDir * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed), ref smoothMoveVelocity, smoothTime);
+        Vector2 axis = new Vector2(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal")) * walkSpeed;
+        Vector3 forward = new Vector3(-cameraHolder.transform.right.z, 0.0f, cameraHolder.transform.right.x);
+        Vector3 wishDirection = forward * axis.x + cameraHolder.transform.right * axis.y + Vector3.up * rb.velocity.y;
+        rb.velocity = wishDirection;
     }
 
     void Jump()
@@ -164,12 +159,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     void Look()
     {
-        transform.Rotate(Vector3.up * Input.GetAxisRaw("Mouse X") * mouseSensitivity);
+        pitch -= Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
+        pitch = Mathf.Clamp(pitch, -90.0f, 90.0f);
+        yaw += Input.GetAxisRaw("Mouse X") * mouseSensitivity;
 
-        verticalLookRotation += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
-        verticalLookRotation = Mathf.Clamp(verticalLookRotation, -90f, 90f);
-        
-        cameraHolder.transform.localEulerAngles = Vector3.left * verticalLookRotation;
+        Debug.Log($"yaw : {yaw}, pitch : {pitch}");
+        cameraHolder.transform.localRotation = Quaternion.Euler(pitch, yaw, 0);
+        transform.localRotation = Quaternion.Euler(pitch, yaw, 0);
     }
     
 
@@ -194,16 +190,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     void EquipItem(int _index)
     {
         if (_index == previousItemIndex)
-        {
             return;
-        }
+        
         itemIndex = _index;
         items[itemIndex].itemGameObject.SetActive(true);
         
         if (previousItemIndex != -1)
-        {
             items[previousItemIndex].itemGameObject.SetActive(false);
-        }
 
         previousItemIndex = itemIndex;
 
@@ -256,7 +249,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 ui_death.text = "DEATHS : " + Convert.ToString((int)changedProps["Death"]);
             }
         }
-        
 
         if (changedProps.ContainsKey("Kills"))
         {

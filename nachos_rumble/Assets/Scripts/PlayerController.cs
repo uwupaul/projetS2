@@ -88,22 +88,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
             EquipItem(0);
             
-            if (!EscapeMod) {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-            }
-            else {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            }
+            if (EscapeMod)
+                SettingsMenu.EnableMouse();
+            else
+                SettingsMenu.DisableMouse();
         }
         else
         {
             Destroy(GetComponentInChildren<Camera>().gameObject);
             Destroy(rb);
         }
-        
-        Debug.Log(EscapeMod);
     }
 
     void Update()
@@ -113,6 +107,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         if (!EscapeMod)
         {
+            Debug.Log("ouhiouahaa");
             Look(); Jump(); UseItem();
             //moveAmount = Vector3.SmoothDamp(moveAmount,
             //    new Vector3(0,0,0) * 0, ref smoothMoveVelocity, smoothTime);
@@ -121,7 +116,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (transform.position.y < -5f)
             Die();
         
-        Debug.Log(EscapeMod);
+        Debug.Log($"EscapeMod == {EscapeMod}");
     }
     
     private void FixedUpdate()

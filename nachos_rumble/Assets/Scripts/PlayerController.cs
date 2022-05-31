@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using Photon.Pun;
 using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
@@ -25,6 +26,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         float verticalLookRotation;
         bool grounded;
+        private bool previousGrounded;
         Vector3 smoothMoveVelocity;
         Vector3 moveAmount;
 
@@ -47,7 +49,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         public TextMeshPro playerUsername;
 
     #endregion
-
+    
     Rigidbody rb;
     PhotonView PV;
     PlayerManager playerManager;
@@ -274,10 +276,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             return;
         
         currentHealth -= damage;
+        
+        textHealth.text = currentHealth + "";
+
+        if (currentHealth <= 10)
+        {
+            textHealth.color = Color.red;
+        }
+        
         HealthBar.SetHealth(currentHealth);
 
         if (currentHealth <= 0) {
-            ApplyKill(opponent);
+            if (opponent != null)
+            {
+                ApplyKill(opponent);
+            }
             Die();
         }
         else

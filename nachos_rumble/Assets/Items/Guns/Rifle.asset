@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Rifle
   m_EditorClassIdentifier: 
   itemName: Rifle
-  damage: 20
+  damage: 33
   shotSpread: 12
   shotsPerSeconds: 9

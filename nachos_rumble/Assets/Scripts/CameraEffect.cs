@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 public class CameraEffect : MonoBehaviour
 {
     public static CameraEffect Instance;
-    bool AlreadyShaking = false;
+    bool AlreadyShaking;
 
     void Awake()
     {
@@ -21,17 +21,20 @@ public class CameraEffect : MonoBehaviour
 
         AlreadyShaking = true;
         Debug.Log("ShakeCamera Coroutine started");
-        Vector3 startPosition =  gameObject.transform.position;
+        
+        Vector3 startPosition =  gameObject.transform.localPosition;
         float elapsedTime = 0f;
 
         while (elapsedTime < duration) {
             elapsedTime += Time.deltaTime;
-            gameObject.transform.position = startPosition + Random.insideUnitSphere * 0.03f;
+            gameObject.transform.localPosition = startPosition + Random.insideUnitSphere * 0.03f;
             for (int i = 0; i < 4; i++)
                 yield return null;
         }
 
-        gameObject.transform.position = startPosition;
+        gameObject.transform.localPosition = startPosition;
         AlreadyShaking = false;
+        
+        Debug.Log("ShakeCamera Coroutine ended");
     }
 }

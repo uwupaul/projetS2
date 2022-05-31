@@ -6,28 +6,43 @@ using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Photon.Realtime;
 using TMPro;
+using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
+    public GameObject cameraHolder;
+    public GameObject cam;
+    PhotonView PV;
+    PlayerManager playerManager;
+
     #region Items
-        [SerializeField] Item[] items;
-        
+        public Item[] items;
         int itemIndex;
         int previousItemIndex = -1;
     #endregion
-
+        
     #region Physics
-        [SerializeField] GameObject cameraHolder;
-        [SerializeField] GameObject cam;
-        [SerializeField] float sprintSpeed, walkSpeed, jumpForce;
+        public float sprintSpeed, walkSpeed;
+        
+        public bool grounded;
+        private bool wasGrounded;
+        public Transform groundCheck;
+        public float groundDistance;
+        public LayerMask groundMask;
+        // ajouter tout l'environnement dans la layer groundMask
+        
+        public float jumpHeight;
+        public float airMultiplyer;
+        
+        public float fallSpeedThreshold;
+        
+        public float gravity;
+        private Vector3 velocity;
+        
+        private float moveSpeed;
+        private float xRotation;
 
-        float verticalLookRotation;
-        bool grounded;
-        private bool previousGrounded;
-        Vector3 smoothMoveVelocity;
-        Vector3 moveAmount;
-
-        private float yaw = 0.0f, pitch = 0.0f;
+        public CharacterController CharacterController;
     #endregion
     
     #region Health
@@ -47,10 +62,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     #endregion
     
-    Rigidbody rb;
-    PhotonView PV;
-    PlayerManager playerManager;
-    
     #region UI
     UIManager UIM;
     bool EscapeMod => UIM.EscapeMod;
@@ -58,12 +69,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     #endregion
     
     [HideInInspector] public ProfileData playerProfile;
-
-    
     
     void Awake()
     {
-        rb = GetComponent<Rigidbody>();
         PV = GetComponent<PhotonView>();
         playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
         UIM = playerManager.GetComponentInChildren<UIManager>();
@@ -73,19 +81,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         if (PV.IsMine)
         {
-            ui_username = GameObject.Find("Canvas/BottomLeft/UsernameText").GetComponent<TextMeshProUGUI>();
-            ui_kills = GameObject.Find("Canvas/TopRight/KillsText").GetComponent<TextMeshProUGUI>();
-            ui_death = GameObject.Find("Canvas/TopRight/DeathText").GetComponent<TextMeshProUGUI>();
-            textHealth = GameObject.Find("Canvas/BottomLeft/TextHealth").GetComponent<TextMeshProUGUI>();
-            HealthBar = GameObject.Find("Canvas/BottomLeft/HealthBar").GetComponent<HealthBar>();
+            #region UI
+                ui_username = GameObject.Find("Canvas/BottomLeft/UsernameText").GetComponent<TextMeshProUGUI>();
+                ui_kills = GameObject.Find("Canvas/TopRight/KillsText").GetComponent<TextMeshProUGUI>();
+                ui_death = GameObject.Find("Canvas/TopRight/DeathText").GetComponent<TextMeshProUGUI>();
+                textHealth = GameObject.Find("Canvas/BottomLeft/TextHealth").GetComponent<TextMeshProUGUI>();
+                HealthBar = GameObject.Find("Canvas/BottomLeft/HealthBar").GetComponent<HealthBar>();
 
-            HealthBar.SetMaxHealth(MaxHealth);
-            textHealth.text = MaxHealth.ToString();
-            textHealth.color = Color.white; 
-            ui_username.text = Launcher.myProfile.username;
-
+                HealthBar.SetMaxHealth(MaxHealth);
+                textHealth.text = MaxHealth.ToString();
+                textHealth.color = Color.white;
+                ui_username.text = Launcher.myProfile.username; // ou Photon.Nickname ?
+            #endregion
+            
             photonView.RPC("SyncProfile",RpcTarget.All,Launcher.myProfile.username,Launcher.myProfile.level,Launcher.myProfile.xp);
-
+            //?
+            
             EquipItem(0);
             
             if (EscapeMod)
@@ -94,10 +105,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 SettingsMenu.DisableMouse();
         }
         else
-        {
             Destroy(GetComponentInChildren<Camera>().gameObject);
-            Destroy(rb);
-        }
     }
 
     void Update()
@@ -105,29 +113,37 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if(!PV.IsMine)
             return;
 
-        if (!EscapeMod)
-        {
-            Debug.Log("ouhiouahaa");
-            Look(); Jump(); UseItem();
-            //moveAmount = Vector3.SmoothDamp(moveAmount,
-            //    new Vector3(0,0,0) * 0, ref smoothMoveVelocity, smoothTime);
-        }
+        
+        
+        #region Movement
+            wasGrounded = grounded;
+            grounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+            
+            if (!wasGrounded && grounded)
+            {
+                Debug.Log(velocity.y);
+                
+                if (velocity.y < fallSpeedThreshold)
+                {
+                    float fallDamage = Mathf.Round(-7f * velocity.y - 100f) ;
+                    RPC_TakeDamage(fallDamage, null);
+                }
+            }
 
+            if (grounded && velocity.y < 0)
+                velocity.y = -2f;
+
+            velocity.y += gravity * Time.deltaTime;
+            CharacterController.Move(velocity * Time.deltaTime);
+        #endregion
+
+        if (!EscapeMod)
+            Look(); Jump(); UseItem(); Move();
+        
         if (transform.position.y < -5f)
             Die();
-        
-        Debug.Log($"EscapeMod == {EscapeMod}");
     }
-    
-    private void FixedUpdate()
-    {
-        if(!PV.IsMine)
-            return;
 
-        if (!EscapeMod)
-            Move();
-    }
-    
     [PunRPC]
     private void SyncProfile(string p_username, int p_level,int p_xp) //profile de chq player (username in game)
     {
@@ -140,32 +156,36 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     
     void Move()
     {
-        Vector2 axis = new Vector2(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal")) * walkSpeed;
-        Vector3 forward = new Vector3(-cameraHolder.transform.right.z, 0.0f, cameraHolder.transform.right.x);
-        Vector3 wishDirection = forward * axis.x + cameraHolder.transform.right * axis.y + Vector3.up * rb.velocity.y;
-        rb.velocity = wishDirection;
+        float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
+
+        if (!grounded)
+        {
+            horizontalInput *= airMultiplyer;
+            verticalInput *= airMultiplyer;
+        }
+        
+        moveSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed;
+        Vector3 move = Vector3.ClampMagnitude((transform.right * horizontalInput + transform.forward * verticalInput), 1f);
+        CharacterController.Move(move * moveSpeed * Time.deltaTime);
     }
 
     void Jump()
     {
         if (Input.GetKeyDown(KeyCode.Space) && grounded)
-            rb.AddForce(transform.up * jumpForce);
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
     }
 
     void Look()
     {
-        pitch -= Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
-        pitch = Mathf.Clamp(pitch, -90.0f, 90.0f);
-        yaw += Input.GetAxisRaw("Mouse X") * mouseSensitivity;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-        cameraHolder.transform.localRotation = Quaternion.Euler(pitch, yaw, 0);
-        transform.localRotation = Quaternion.Euler(pitch, yaw, 0);
-    }
-    
-
-    public void SetGroundedState(bool _grounded)
-    {
-        grounded = _grounded;
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+        
+        cameraHolder.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        transform.Rotate(Vector3.up * mouseX);
     }
 
     #endregion
@@ -233,24 +253,27 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 			EquipItem((int)changedProps["itemIndex"]);
 		}
 
+        if (!PV.IsMine)
+            return;
+        
         if (changedProps.ContainsKey("Death"))
         {
-            Debug.Log($"{targetPlayer.NickName} died {(int)changedProps["Death"]} times.");
+            //Debug.Log($"{targetPlayer.NickName} died {(int)changedProps["Death"]} times.");
             
-            if (PV.IsMine && targetPlayer == PV.Owner)
+            if (targetPlayer == PV.Owner)
             {
-                //text death
+                //deaths number text
                 ui_death.text = "DEATHS : " + Convert.ToString((int)changedProps["Death"]);
             }
         }
 
         if (changedProps.ContainsKey("Kills"))
         {
-            Debug.Log($"{targetPlayer.NickName} has {(int) changedProps["Kills"]} kills.");
+            //Debug.Log($"{targetPlayer.NickName} has {(int) changedProps["Kills"]} kills.");
 
-            if (PV.IsMine && targetPlayer == PV.Owner)
+            if (targetPlayer == PV.Owner)
             {
-                //text kills
+                //kills number text
                 ui_kills.text = "KILLS : " + Convert.ToString((int)changedProps["Kills"]);
             }
         }
@@ -268,26 +291,25 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             return;
         
         currentHealth -= damage;
-        
-        textHealth.text = currentHealth + "";
 
-        if (currentHealth <= 10)
+        
+
+        if (currentHealth <= 0)
         {
-            textHealth.color = Color.red;
-        }
-        
-        HealthBar.SetHealth(currentHealth);
-
-        if (currentHealth <= 0) {
             if (opponent != null)
-            {
                 ApplyKill(opponent);
-            }
+            
             Die();
         }
         else
         {
-            UIManager.Instance.HitEffect(); // pour l'instant ne fait rien
+            if (currentHealth <= 10)
+                textHealth.color = Color.red;
+            
+            textHealth.text = currentHealth.ToString();
+            HealthBar.SetHealth(currentHealth);
+            
+            // UIManager.Instance.HitEffect(); // pour l'instant ne fait rien
             StartCoroutine(cam.GetComponent<CameraEffect>().ShakeCamera(0.03f));
         }
     }

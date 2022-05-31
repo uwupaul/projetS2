@@ -646,7 +646,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.032656882}
+  m_AnchoredPosition: {x: 0, y: 0.15192759}
   m_SizeDelta: {x: 0, y: 36.3955}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &1408646995362367542
@@ -1460,7 +1460,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 26.25
+  m_fontSize: 34.45
   m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1809,7 +1809,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 850, y: 12}
-  m_SizeDelta: {x: 500, y: 45}
+  m_SizeDelta: {x: 500, y: 55}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2829357155348535977
 CanvasRenderer:
@@ -3514,7 +3514,7 @@ MonoBehaviour:
   audioMixer: {fileID: 24100000, guid: 8ed5b54e6c35175438b09486c7b4421a, type: 2}
   masterVolumeSlider: {fileID: 5472103383235968946}
   mouseSensitivitySlider: {fileID: 1353796030630751801}
-  mouseSensitivity: 0
+  mouseSensitivity: 2
 --- !u!1 &9089572344467990792
 GameObject:
   m_ObjectHideFlags: 0

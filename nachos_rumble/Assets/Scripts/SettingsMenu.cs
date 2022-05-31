@@ -26,18 +26,14 @@ public class SettingsMenu : MonoBehaviourPunCallbacks
         audioMixer.GetFloat("MasterVolume",out masterVolume);
         
         masterVolumeSlider.value = masterVolume;
-        mouseSensitivity = 1;
+        mouseSensitivity = 2;
         mouseSensitivitySlider.value = mouseSensitivity;
     }
 
     public void Toggle()
     {
-        Debug.Log("settings menu : toggle");
-        
         gameObject.SetActive(!gameObject.activeSelf);
         _EscapeMod = !_EscapeMod;
-
-        Debug.Log("settings menu : toggle" + _EscapeMod + gameObject.activeSelf);
         
         if (_EscapeMod)
             EnableMouse();
@@ -83,7 +79,6 @@ public class SettingsMenu : MonoBehaviourPunCallbacks
     
     public void QuitRoom()
     {
-        Debug.Log($"SettingsMenu : QuitRoom");
         Destroy(RoomManager.Instance.gameObject);
         PhotonNetwork.LeaveRoom();
     }

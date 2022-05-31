@@ -17,15 +17,14 @@ public class UIManager : MonoBehaviourPunCallbacks
         }
         Instance = this;
         EscapeMod = false;
+
+        SettingsMenu.DisableMouse();
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Debug.Log("Escape pressed in UIManager");
             settingsMenu.Toggle();
-        }
     }
 
     public void HitEffect()

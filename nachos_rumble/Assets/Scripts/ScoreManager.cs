@@ -17,7 +17,4 @@ public class ScoreManager : MonoBehaviour
             Instantiate(playerScoreListPrefab, PlayerScoreEntry).GetComponent<PlayScoreScript>().SetUP(player);
         }
     }
-
-
-
 }

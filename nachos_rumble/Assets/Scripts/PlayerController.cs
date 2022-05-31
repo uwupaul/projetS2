@@ -80,6 +80,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             HealthBar = GameObject.Find("Canvas/BottomLeft/HealthBar").GetComponent<HealthBar>();
 
             HealthBar.SetMaxHealth(MaxHealth);
+            textHealth.text = MaxHealth.ToString();
             textHealth.color = Color.white; 
             ui_username.text = Launcher.myProfile.username;
 
@@ -101,6 +102,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             Destroy(GetComponentInChildren<Camera>().gameObject);
             Destroy(rb);
         }
+        
+        Debug.Log(EscapeMod);
     }
 
     void Update()
@@ -160,7 +163,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         pitch = Mathf.Clamp(pitch, -90.0f, 90.0f);
         yaw += Input.GetAxisRaw("Mouse X") * mouseSensitivity;
 
-        Debug.Log($"yaw : {yaw}, pitch : {pitch}");
         cameraHolder.transform.localRotation = Quaternion.Euler(pitch, yaw, 0);
         transform.localRotation = Quaternion.Euler(pitch, yaw, 0);
     }

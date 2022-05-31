@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class UIManager : MonoBehaviourPunCallbacks
 {
@@ -14,7 +10,7 @@ public class UIManager : MonoBehaviourPunCallbacks
     
     private void Awake()
     {
-        if (Instance && Instance != this)// verifie si une autre roomManager exists
+        if (Instance && Instance != this)// verifie si une autre UIM exists
         {
             Destroy(gameObject); // il ne peut y en avoir que un 
             return;

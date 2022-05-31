@@ -16,23 +16,33 @@ public class ProfileData
     public string username;
     public int level;
     public int xp;
+    public int globalKill;
+    public int globalDeath;
 
     public ProfileData() //profile par defaut
     {
-        this.username = "DEFAULT USERNAME";
+        this.username = "";
         this.level = 0;
         this.xp = 0;
+        this.globalDeath = 0;
+        this.globalKill = 0;
     }
-    public ProfileData(string u, int l, int x)
+
+    public ProfileData(string u, int l, int x, int k, int d)
     {
         this.username = u;
         this.level = l;
         this.xp = x;
+        this.globalDeath = d;
+        this.globalKill = k;
     }
 }
 public class Launcher : MonoBehaviourPunCallbacks
 {
     public InputField usernameField;
+    [SerializeField] Text globalKillsField;
+    [SerializeField] Text globalDeathsField;
+    [SerializeField] Text KDField;
     public static ProfileData myProfile = new ProfileData();
 
     private PhotonView PV;
@@ -53,6 +63,11 @@ public class Launcher : MonoBehaviourPunCallbacks
 
         myProfile = Data.LoadProfile(); //charger notre profile
         usernameField.text = myProfile.username;
+        globalKillsField.text = "Kills : " + myProfile.globalKill;
+        globalDeathsField.text = "Deaths : " + myProfile.globalDeath;
+        float kd = (float) myProfile.globalKill /  myProfile.globalDeath;
+        KDField.text = "K/D : " + $"{kd:0.00}";
+        PhotonNetwork.NickName = myProfile.username;
     }
 
     void Start()
@@ -88,7 +103,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         
         MenuManager.menuManager.OpenMenu("title");
         Debug.Log("Joined Lobby");
-        PhotonNetwork.NickName = myProfile.username; //pour le moment A FIX !! , demande a paul
+         //pour le moment A FIX !! , demande a paul
     }
 
     public void CreateRoom()
@@ -108,10 +123,12 @@ public class Launcher : MonoBehaviourPunCallbacks
         if (string.IsNullOrEmpty(usernameField.text)) // pour les pseudos
         {
             myProfile.username = "PLAYER_" + Random.Range(100, 1000);
+            PhotonNetwork.NickName = myProfile.username;
         }
         else
         {
             myProfile.username = usernameField.text;
+            PhotonNetwork.NickName = myProfile.username;
         }
         
         Data.SaveProfile(myProfile); // save le profile

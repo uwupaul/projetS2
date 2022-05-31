@@ -1,14 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using Photon.Pun;
 using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Photon.Realtime;
-using UnityEngine.UI;
 using TMPro;
-using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
@@ -81,8 +78,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             ui_death = GameObject.Find("Canvas/TopRight/DeathText").GetComponent<TextMeshProUGUI>();
             textHealth = GameObject.Find("Canvas/BottomLeft/TextHealth").GetComponent<TextMeshProUGUI>();
             HealthBar = GameObject.Find("Canvas/BottomLeft/HealthBar").GetComponent<HealthBar>();
-            
+
             HealthBar.SetMaxHealth(MaxHealth);
+            textHealth.color = Color.white; 
             ui_username.text = Launcher.myProfile.username;
 
             photonView.RPC("SyncProfile",RpcTarget.All,Launcher.myProfile.username,Launcher.myProfile.level,Launcher.myProfile.xp);
@@ -109,10 +107,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         if(!PV.IsMine)
             return;
-        
-        textHealth.text = currentHealth + "";
-        // pas ouf de le mettre dans update vaut mieux le mettre quand on perd de la vie
-        
+
         if (!EscapeMod)
         {
             Look(); Jump(); UseItem();

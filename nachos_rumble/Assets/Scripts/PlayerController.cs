@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         [SerializeField] float sprintSpeed, walkSpeed, jumpForce;
 
         float verticalLookRotation;
-        bool grounded;
+        public bool grounded;
         private bool previousGrounded;
         Vector3 smoothMoveVelocity;
         Vector3 moveAmount;

@@ -83,8 +83,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             #region UI
                 ui_username = GameObject.Find("Canvas/BottomLeft/UsernameText").GetComponent<TextMeshProUGUI>();
-                ui_kills = GameObject.Find("Canvas/TopRight/KillsText").GetComponent<TextMeshProUGUI>();
-                ui_death = GameObject.Find("Canvas/TopRight/DeathText").GetComponent<TextMeshProUGUI>();
+                ui_kills = GameObject.Find("Canvas/TopLeft/KillsText").GetComponent<TextMeshProUGUI>();
+                ui_death = GameObject.Find("Canvas/TopLeft/DeathText").GetComponent<TextMeshProUGUI>();
                 textHealth = GameObject.Find("Canvas/BottomLeft/TextHealth").GetComponent<TextMeshProUGUI>();
                 HealthBar = GameObject.Find("Canvas/BottomLeft/HealthBar").GetComponent<HealthBar>();
 

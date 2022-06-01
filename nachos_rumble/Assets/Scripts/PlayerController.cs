@@ -222,7 +222,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     void UseItem() //utiliser les items (souvent gun)
     {
-        for (int i = 0; i < items.Length; i++)
+        int i;
+        for (i = 0; i < items.Length; i++)
         {
             if (Input.GetKeyDown((i + 1).ToString()))
             {
@@ -231,8 +232,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             }
         }
 
-        if (Input.GetMouseButtonDown(0))
-            items[itemIndex].Use();
+        if (((GunInfo) items[itemIndex].itemInfo).isAutomatic)
+        {
+            if (Input.GetMouseButton(0))
+                items[itemIndex].Use();
+        }
+        else
+        {
+            if (Input.GetMouseButtonDown(0))
+                items[itemIndex].Use();
+        }
+
     }
     #endregion
 	public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)

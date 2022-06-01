@@ -16,3 +16,4 @@ MonoBehaviour:
   damage: 33
   shotSpread: 12
   shotsPerSeconds: 9
+  isAutomatic: 1

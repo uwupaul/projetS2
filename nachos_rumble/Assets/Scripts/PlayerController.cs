@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     #region Items
         public Item[] items;
-        int itemIndex = 0;
+        int itemIndex;
         int previousItemIndex = -1;
     #endregion
         
@@ -29,7 +29,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         public Transform groundCheck;
         public float groundDistance;
         public LayerMask groundMask;
-        // ajouter tout l'environnement dans la layer groundMask
         
         public float jumpHeight;
         public float airMultiplyer;
@@ -95,8 +94,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 playerUsername.text = Launcher.myProfile.username;
             #endregion
             
-            photonView.RPC("SyncProfile",RpcTarget.All,Launcher.myProfile.username,Launcher.myProfile.level,Launcher.myProfile.xp);
-            //revoir
+            CharacterController.detectCollisions = false;
             
             EquipItem(0);
             
@@ -113,7 +111,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         if(!PV.IsMine)
             return;
-
+        
         #region Movement
             wasGrounded = grounded;
             grounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);

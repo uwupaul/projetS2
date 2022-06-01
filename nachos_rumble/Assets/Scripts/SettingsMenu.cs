@@ -79,7 +79,7 @@ public class SettingsMenu : MonoBehaviourPunCallbacks
     
     public void QuitRoom()
     {
-        Destroy(RoomManager.Instance.gameObject);
+        //Destroy(RoomManager.Instance.gameObject);
         PhotonNetwork.LeaveRoom();
     }
 }

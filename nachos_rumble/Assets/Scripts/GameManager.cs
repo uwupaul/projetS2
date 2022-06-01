@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using PlayerData;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -95,14 +96,17 @@ public class GameManager : MonoBehaviourPunCallbacks
     
     void QuitRoom()
     {
-        Destroy(RoomManager.Instance.gameObject);
+        //Destroy(RoomManager.Instance.gameObject);
         PhotonNetwork.LeaveRoom();
     }
     
     public override void OnLeftRoom()
     {
+        RoomManager.Instance.transform.SetParent(GameObject.Find("RoomManagerParentToLeaveRoomProperly").transform);
+        // on set le parent du RoomManager comme un objet qui lui est détruit OnSceneLoaded
+        
         PhotonNetwork.LoadLevel(0);
-        Debug.Log($"SetingsMenu : OnLeftRoom");
+        Debug.Log($"SettingsMenu : OnLeftRoom");
         SettingsMenu.EnableMouse();
         Destroy(gameObject);
     }

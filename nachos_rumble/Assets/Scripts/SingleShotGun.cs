@@ -40,7 +40,7 @@ public class SingleShotGun : Gun
         {
             Debug.Log("SingeShotGun : Shoot() : RayCast the object :" + hit.collider.gameObject);
             hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo) itemInfo).damage, PV.Owner);
-            if (!hit.collider.gameObject.GetComponent<PlayerGroundCheck>() && !hit.collider.gameObject.CompareTag("Player"))
+            if (!hit.collider.gameObject.CompareTag("Player"))
                 PV.RPC("RPC_Shoot",RpcTarget.All, hit.point,hit.normal);
         }
 

@@ -457,7 +457,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   jumpHeight: 1.5
-  airMultiplyer: 0.5
+  airMultiplyer: 0.75
   fallSpeedThreshold: -15
   gravity: -20
   CharacterController: {fileID: 7537678318609877749}
@@ -467,6 +467,8 @@ MonoBehaviour:
     username: DEFAULT USERNAME
     level: 0
     xp: 0
+    globalKill: 0
+    globalDeath: 0
 --- !u!143 &7537678318609877749
 CharacterController:
   m_ObjectHideFlags: 0
@@ -937,8 +939,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 162, y: 184}
-  m_SizeDelta: {x: 267.2493, y: 82.7719}
+  m_AnchoredPosition: {x: 161.2, y: 187.7}
+  m_SizeDelta: {x: 247.9643, y: 76.799}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8408703935705183698
 CanvasRenderer:
@@ -1049,8 +1051,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 116, y: 184}
-  m_SizeDelta: {x: 127.05151, y: 79.69589}
+  m_AnchoredPosition: {x: 127.83099, y: 186.58813}
+  m_SizeDelta: {x: 121.0746, y: 75.9467}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8632691187817684323
 CanvasRenderer:
@@ -1439,7 +1441,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6ce46dcb795d4cf4685d40813331c7aa, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.046
+      value: -0.08
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6ce46dcb795d4cf4685d40813331c7aa, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1643,15 +1645,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 43a5d2009106b0846bbc4ac26f6b6174, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.032
+      value: 0.116
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 43a5d2009106b0846bbc4ac26f6b6174, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.056
+      value: 0.051
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 43a5d2009106b0846bbc4ac26f6b6174, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.03
+      value: -0.012
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 43a5d2009106b0846bbc4ac26f6b6174, type: 3}
       propertyPath: m_LocalRotation.w

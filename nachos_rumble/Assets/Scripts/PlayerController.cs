@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     #region Items
         public Item[] items;
-        int itemIndex;
+        int itemIndex = 0;
         int previousItemIndex = -1;
     #endregion
         
@@ -92,10 +92,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 textHealth.text = MaxHealth.ToString();
                 textHealth.color = Color.white;
                 ui_username.text = Launcher.myProfile.username; // ou Photon.Nickname ?
+                playerUsername.text = Launcher.myProfile.username;
             #endregion
             
             photonView.RPC("SyncProfile",RpcTarget.All,Launcher.myProfile.username,Launcher.myProfile.level,Launcher.myProfile.xp);
-            //?
+            //revoir
             
             EquipItem(0);
             
@@ -113,16 +114,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if(!PV.IsMine)
             return;
 
-        
-        
         #region Movement
             wasGrounded = grounded;
             grounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
             
             if (!wasGrounded && grounded)
             {
-                Debug.Log(velocity.y);
-                
                 if (velocity.y < fallSpeedThreshold)
                 {
                     float fallDamage = Mathf.Round(-7f * velocity.y - 100f) ;
@@ -138,14 +135,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         #endregion
 
         if (!EscapeMod)
+        {
             Look(); Jump(); UseItem(); Move();
+        }
         
         if (transform.position.y < -5f)
             Die();
     }
 
     [PunRPC]
-    private void SyncProfile(string p_username, int p_level, int p_xp, int p_globalKills, int p_globalDeaths) //profile de chq player (username in game)
+    private void SyncProfile(string p_username, int p_level, int p_xp, int p_globalKills, int p_globalDeaths) //profil de chq player (username in game)
     {
         playerProfile = new ProfileData(p_username,p_level,p_xp,p_globalKills,p_globalDeaths);
         playerUsername.text = playerProfile.username;
@@ -178,8 +177,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     void Look()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * 0.5f;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * 0.5f;
 
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
@@ -221,14 +220,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 			PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
             ChangeLayersRecursively(items[itemIndex].itemGameObject.transform, "Weapons");
 		}
-    }
-
-    public override void OnPlayerEnteredRoom(Player newPlayer)
-    {
-        // pour faire apparaître les armes de chaque joueur lorsqu'un nouveau joueur rentre dans la partie
-        
-        if (PV.Owner != newPlayer)
-            EquipItem((int)PV.Owner.CustomProperties["itemIndex"]);
     }
 
     void UseItem() //utiliser les items (souvent gun)
@@ -294,8 +285,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             return;
         
         currentHealth -= damage;
-
-        
 
         if (currentHealth <= 0)
         {

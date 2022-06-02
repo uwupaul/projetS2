@@ -9,23 +9,13 @@ public class audiomenu : MonoBehaviour
     [SerializeField] private AudioSource _audioSource;
     [SerializeField] private Toggle check;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        volume.value = 0.3f;
-    }
-
-    // Update is called once per frame
-    void Update()
+    public void OnSliderValueChanged()
     {
         _audioSource.volume = volume.value;
-        if (!check.isOn)
-        {
-            _audioSource.mute = true;
-        }
-        else
-        {
-            _audioSource.mute = false;
-        }
+    }
+
+    public void OnToggleValueChanged()
+    {
+        _audioSource.mute = !check.isOn;
     }
 }

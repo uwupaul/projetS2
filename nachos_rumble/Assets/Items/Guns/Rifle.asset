@@ -17,3 +17,5 @@ MonoBehaviour:
   shotSpread: 12
   shotsPerSeconds: 9
   isAutomatic: 1
+  canScope: 0
+  gunIndex: 1

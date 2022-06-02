@@ -46,6 +46,7 @@ MonoBehaviour:
   - RPC_QuitRoom
   - RPC_EndGame
   - RPC_SyncWeapon
+  - RPC_KillFeedEntry
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

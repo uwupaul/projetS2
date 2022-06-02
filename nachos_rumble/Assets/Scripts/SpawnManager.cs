@@ -31,7 +31,6 @@ public class SpawnManager : MonoBehaviour
         {
             float playerDistance = Vector3.Distance(t.position, p.transform.position);
             // distance entre le transform 't' du spawn et la position du player
-            Debug.Log(playerDistance);
             if (playerDistance < securityDistance)
                 return false;
         }

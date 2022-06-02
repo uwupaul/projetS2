@@ -18,3 +18,4 @@ MonoBehaviour:
   shotsPerSeconds: 1
   isAutomatic: 0
   canScope: 1
+  gunIndex: 2

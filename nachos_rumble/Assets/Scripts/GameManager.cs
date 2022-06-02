@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         
         if (changedProps.ContainsKey("Kills"))
         {
-            Debug.Log($"{targetPlayer} has {(int)changedProps["Kills"]} eliminations.");
+            //Debug.Log($"{targetPlayer} has {(int)changedProps["Kills"]} eliminations.");
             
             if ((int) changedProps["Kills"] >= scoreToWin)
             {

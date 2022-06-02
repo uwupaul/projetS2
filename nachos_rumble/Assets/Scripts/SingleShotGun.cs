@@ -27,19 +27,15 @@ public class SingleShotGun : Gun
     {
         if (!canShoot)
         {
-            Debug.Log("canShoot == false");
             yield break;
         }
-
-        Debug.Log("canShoot == true(?)");
         canShoot = false;
         //Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
         Ray ray = GetRayCast();
         ray.origin = cam.transform.position;
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            Debug.Log("SingeShotGun : Shoot() : RayCast the object :" + hit.collider.gameObject);
-            hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo) itemInfo).damage, PV.Owner);
+            hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo) itemInfo).damage, PV.Owner, ((GunInfo) itemInfo).gunIndex);
             if (!hit.collider.gameObject.CompareTag("Player") && !hit.collider.gameObject.CompareTag("Camera"))
                 PV.RPC("RPC_Shoot",RpcTarget.All, hit.point,hit.normal);
         }
@@ -62,7 +58,6 @@ public class SingleShotGun : Gun
         Collider[] colliders = Physics.OverlapSphere(hitPosition, 0.3f);
         if (colliders.Length != 0)
         {
-            Debug.Log("RPC_Shoot : RayCast hit an object.");
             GameObject bulletImpactObj = Instantiate(bulletImpactPrefab, hitPosition + hitNormal * 0.001f,
                 Quaternion.LookRotation(hitNormal, Vector3.up) * bulletImpactPrefab.transform.rotation);
             Destroy(bulletImpactObj, 11f);

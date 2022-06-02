@@ -41,7 +41,6 @@ public class SettingsMenu : MonoBehaviourPunCallbacks
         mouseSensitivitySlider.value = mouseSensitivity;
         resolutionDropdown.value = FindCurrentResolution();
         FullScreenToggle.isOn = Screen.fullScreen;
-        Debug.Log($"screen is full screen == {Screen.fullScreen}");
     }
 
     int FindCurrentResolution()
@@ -51,7 +50,6 @@ public class SettingsMenu : MonoBehaviourPunCallbacks
             if (resolutions[i].Item1 == Screen.currentResolution.width &&
                 resolutions[i].Item2 == Screen.currentResolution.height)
             {
-                Debug.Log($"found that the resolution was {resolutions[i].Item1}x{resolutions[i].Item2}");
                 return i;
             }
         }

@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     
     PhotonView PV;
     PlayerManager playerManager;
+    KillFeed KillFeed;
 
     #region Items
         public Item[] items;
@@ -93,6 +94,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 textHealth.color = Color.white;
                 ui_username.text = Launcher.myProfile.username; // ou Photon.Nickname ?
                 playerUsername.text = Launcher.myProfile.username;
+
+                KillFeed = GameObject.Find("Canvas/KillFeed").GetComponent<KillFeed>();
             #endregion
             
             CharacterController.detectCollisions = false;
@@ -122,7 +125,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 if (velocity.y < fallSpeedThreshold)
                 {
                     float fallDamage = Mathf.Round(-7f * velocity.y - 100f) ;
-                    RPC_TakeDamage(fallDamage, null);
+                    RPC_TakeDamage(fallDamage, null, -1);
                 }
             }
 
@@ -289,13 +292,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
     }
 
-    public void TakeDamage(float damage, Player opponent)
+    public void TakeDamage(float damage, Player opponent, int gunIndex)
     {
-        PV.RPC("RPC_TakeDamage", RpcTarget.All, damage, opponent);
+        PV.RPC("RPC_TakeDamage", RpcTarget.All, damage, opponent, gunIndex);
     }
 
     [PunRPC]
-    void RPC_TakeDamage(float damage, Player opponent)
+    void RPC_TakeDamage(float damage, Player opponent, int gunIndex)
     {
         if (!PV.IsMine)
             return;
@@ -304,6 +307,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         if (currentHealth <= 0)
         {
+            KillFeed.KillFeedEntry(PV.Owner, opponent, gunIndex);
+
             if (opponent != null)
                 ApplyKill(opponent);
             
@@ -317,7 +322,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             textHealth.text = currentHealth.ToString();
             HealthBar.SetHealth(currentHealth);
             
-            // UIManager.Instance.HitEffect(); // pour l'instant ne fait rien
+            // UIManager.Instance.HitEffect();
             StartCoroutine(cam.GetComponent<CameraEffect>().ShakeCamera(0.03f));
         }
     }

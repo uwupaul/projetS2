@@ -85,7 +85,7 @@ public class AIController : MonoBehaviourPunCallbacks, IDamageable
         return bestTarget;
     }
 
-    public void TakeDamage(float damage, Player opponent)
+    public void TakeDamage(float damage, Player opponent, int gunIndex)
     {
         PV.RPC("RPC_TakeDamage", RpcTarget.All, damage, opponent);
         Debug.Log($"AI took {damage} damage.");

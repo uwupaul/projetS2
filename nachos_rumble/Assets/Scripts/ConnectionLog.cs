@@ -11,8 +11,8 @@ public class ConnectionLog : MonoBehaviourPunCallbacks
 {
     public GameObject connectionLogPrefab;
 
-    public List<GameObject> itemList = new List<GameObject>();
-    public Queue<GameObject> ItemsQueue = new Queue<GameObject>();
+    private List<GameObject> itemList = new List<GameObject>();
+    private Queue<GameObject> ItemsQueue = new Queue<GameObject>();
     
     public int maxItemNumber;
     public float timeAlive;
@@ -31,8 +31,6 @@ public class ConnectionLog : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        Debug.Log("ConnectionLog : OnPlayerEnteredRoom");
-        
         GameObject go = Instantiate(connectionLogPrefab, transform);
         go.SetActive(false);
         go.GetComponent<ConnectionLogItem>().SetUp(newPlayer, true);
@@ -43,8 +41,6 @@ public class ConnectionLog : MonoBehaviourPunCallbacks
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        Debug.Log("ConnectionLog : OnPlayerLeftRoom");
-        
         GameObject go = Instantiate(connectionLogPrefab, transform);
         go.SetActive(false);
         go.GetComponent<ConnectionLogItem>().SetUp(otherPlayer, false);
@@ -55,8 +51,6 @@ public class ConnectionLog : MonoBehaviourPunCallbacks
 
     void ManageQueue()
     {
-        Debug.Log("ConnectionLog : ManageQueue");
-        
         if (ItemsQueue.Count == 0)
             return;
 
@@ -78,8 +72,6 @@ public class ConnectionLog : MonoBehaviourPunCallbacks
 
     IEnumerator DisplayThenDestroy(GameObject go)
     {
-        Debug.Log("ConnectionLog : DisplayThenDestroy");
-        
         yield return new WaitForSecondsRealtime(timeAlive);
         
         StartCoroutine(FadeOutDestroy(go));
@@ -95,7 +87,6 @@ public class ConnectionLog : MonoBehaviourPunCallbacks
         Color curColor = image.color;
         while(Mathf.Abs(curColor.a - targetAlpha) > 0.05f)
         {
-            Debug.Log(image.material.color.a);
             curColor.a = Mathf.Lerp(curColor.a, targetAlpha, fadeRate * Time.deltaTime);
             image.color = curColor;
             yield return null;

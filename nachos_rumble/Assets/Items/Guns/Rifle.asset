@@ -13,10 +13,7 @@ MonoBehaviour:
   m_Name: Rifle
   m_EditorClassIdentifier: 
   itemName: Rifle
-  damage: 33
-  shotSpread: 12
+  itemIndex: 1
+  damage: 30
+  shotSpread: 9
   shotsPerSeconds: 9
-  isAutomatic: 1
-  gunIndex: 1
-  canScope: 0
-  canScopeOthers: 1

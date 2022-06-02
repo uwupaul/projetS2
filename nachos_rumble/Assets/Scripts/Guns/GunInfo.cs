@@ -9,8 +9,4 @@ public class GunInfo : ItemInfo
     public float damage;
     public float shotSpread;
     public float shotsPerSeconds;
-    public bool isAutomatic;
-    public bool canScope;
-    public int gunIndex;
-    public bool canScopeOthers;
 }

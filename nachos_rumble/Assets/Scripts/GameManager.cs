@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public int scoreToWin = 5;
     Player GameWinner;
     public static GameManager Instance;
-    private bool gameEnded = false;
+    private bool gameEnded;
     
     #region EndScreen
     [SerializeField] GameObject EndScreen;
@@ -58,6 +58,25 @@ public class GameManager : MonoBehaviourPunCallbacks
         
         if (changedProps.ContainsKey("Deaths"))
             Debug.Log($"{targetPlayer} has {(int)changedProps["Deaths"]} deaths.");
+    }
+
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        if (gameEnded && PV.Owner.IsMasterClient)
+            PhotonNetwork.CloseConnection(newPlayer); // pour le kick
+
+        Hashtable H1 = new Hashtable();
+        Hashtable H2 = new Hashtable();
+
+        H1.Add("Kill", 0);
+        H2.Add("Death", 0);
+
+        newPlayer.SetCustomProperties(H1);
+        newPlayer.SetCustomProperties(H2);
+
+        Debug.Log($"GM : Reset stats of {PV.Owner.NickName}");
+        Debug.Log($"GM : Kills of {newPlayer.NickName} : {newPlayer.CustomProperties["Kills"]}");
+        Debug.Log($"GM : Deaths of {newPlayer.NickName} : {newPlayer.CustomProperties["Deaths"]}");
     }
 
     [PunRPC]

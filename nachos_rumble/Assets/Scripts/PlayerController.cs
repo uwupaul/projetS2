@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using ExitGames.Client.Photon.StructWrapping;
 using Photon.Pun;
 using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
@@ -103,6 +104,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             CharacterController.detectCollisions = false;
 
             EquipItem(0);
+            //items[0].Equip();
             
             if (EscapeMod)
                 SettingsMenu.EnableMouse();
@@ -142,6 +144,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             Look(); Jump(); UseItem(); Move();
         }
+        else
+            items[itemIndex].isEquiped = false;
         
         if (transform.position.y < -5f)
             Die();
@@ -194,17 +198,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     #endregion
 
     #region Items Method
-    
-    void ChangeLayersRecursively(Transform trans, string name)
-    {
-        foreach (Transform child in trans)
-        {
-            child.gameObject.layer = LayerMask.NameToLayer(name);
-            ChangeLayersRecursively(child, name);
-        }
-    }
-    
-    void EquipItem(int _index)
+
+    void EquipItemVisually(int _index)
     {
         if (_index == previousItemIndex)
             return;
@@ -216,65 +211,65 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             items[previousItemIndex].itemGameObject.SetActive(false);
 
         previousItemIndex = itemIndex;
-
-		if (PV.IsMine)
-		{
-			Hashtable hash = new Hashtable();
-			hash.Add("itemIndex", itemIndex);
-			PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
-            ChangeLayersRecursively(items[itemIndex].itemGameObject.transform, "Weapons");
-		}
     }
 
-    void UseItem() //utiliser les items (souvent gun)
+    void EquipItem(int _index)
     {
-        int i;
-        for (i = 0; i < items.Length; i++)
+        if (_index == previousItemIndex)
+            return;
+        
+        itemIndex = _index;
+
+        if (previousItemIndex != -1)
+            items[previousItemIndex].Unequip();
+        
+        items[itemIndex].Equip();
+        previousItemIndex = itemIndex;
+    }
+
+    void UseItem()
+    {
+        for (int i = 0; i < items.Length; i++)
         {
             if (Input.GetKeyDown((i + 1).ToString()))
             {
-                items[itemIndex].isScoped = false;
-                if (((GunInfo) items[itemIndex].itemInfo).canScope)
-                {
-                    items[itemIndex].UnScoped();
-                }
-                if (((GunInfo) items[itemIndex].itemInfo).canScopeOthers)
-                {
-                    items[itemIndex].SimpleUnScoped();
-                }
-                EquipItem(i);
+                if (i == previousItemIndex)
+                    continue;
+
+                itemIndex = i;
+                items[itemIndex].Equip();
+                
+                if (previousItemIndex != -1)
+                    items[previousItemIndex].Unequip();
+
+                previousItemIndex = itemIndex;
+
+                /*
+                if (itemIndex != -1)
+                    items[itemIndex].Unequip();
+
+                previousItemIndex = itemIndex;
+                itemIndex = i;
+                items[itemIndex].Equip();
                 break;
+                */
             }
         }
 
-        if (((GunInfo) items[itemIndex].itemInfo).isAutomatic)
-        {
-            if (Input.GetMouseButton(0))
-                items[itemIndex].Use();
-        }
-        else
-        {
-            if (Input.GetMouseButtonDown(0))
-                items[itemIndex].Use();
-        }
-        
-        if (Input.GetMouseButtonDown(1) && ((GunInfo) items[itemIndex].itemInfo).canScope)
-        {
-            items[itemIndex].Scope();
-        }
-        
-        if (Input.GetMouseButtonDown(1) && ((GunInfo) items[itemIndex].itemInfo).canScopeOthers)
-        {
-            items[itemIndex].SimpleScope();
-        }
-        
+        items[itemIndex].isEquiped = true;
     }
     #endregion
 	public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
 	{
 		if (!PV.IsMine && targetPlayer == PV.Owner && changedProps.ContainsKey("itemIndex"))
 		{
-			EquipItem((int)changedProps["itemIndex"]);
+            EquipItemVisually((int)changedProps["itemIndex"]);
+            
+            //items[itemIndex].Unequip();
+            //items[(int)changedProps["itemIndex"]].Equip();
+            
+            Debug.Log($"itemIndex : {itemIndex}");
+            Debug.Log($"changedProps : {(int)changedProps["itemIndex"]}");
 		}
 
         if (!PV.IsMine)
@@ -282,20 +277,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         
         if (changedProps.ContainsKey("Death"))
         {
-            //Debug.Log($"{targetPlayer.NickName} died {(int)changedProps["Death"]} times.");
+            Debug.Log($"PC : {targetPlayer.NickName} died {(int)changedProps["Death"]} times.");
             
             if (targetPlayer == PV.Owner)
             {
                 Launcher.myProfile.globalDeath += 1;
                 //text death
                 ui_death.text = "DEATHS : " + Convert.ToString((int)changedProps["Death"]);
-                
             }
         }
 
         if (changedProps.ContainsKey("Kills"))
         {
-            //Debug.Log($"{targetPlayer.NickName} has {(int) changedProps["Kills"]} kills.");
+            Debug.Log($"PC : {targetPlayer.NickName} has {(int) changedProps["Kills"]} kills.");
 
             if (targetPlayer == PV.Owner)
             {
@@ -353,8 +347,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     void Die()
     {
         deathAudio.Play();
+        items[itemIndex].Unequip();
         playerManager.Die();
-        items[itemIndex].UnScoped();
-        items[itemIndex].SimpleUnScoped();
     }
 }

@@ -13,21 +13,14 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
-        PV.Owner.CustomProperties["Kills"] = 0;
-        PV.Owner.CustomProperties["Deaths"] = 0;
     }
 
     void Start()
     {
         if (PV.IsMine)
         {
-            PV.Owner.CustomProperties["Kills"] = 0;
-            PV.Owner.CustomProperties["Deaths"] = 0;
-            // pour reset le nombre de morts et de kills si on quitte et rejoint la même partie
-            
             CreateController();
         }
-            
     }
 
     void CreateController()

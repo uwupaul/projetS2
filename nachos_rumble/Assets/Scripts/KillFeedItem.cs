@@ -47,7 +47,8 @@ public class KillFeedItem : MonoBehaviour
         StartCoroutine(FadeOutDestroyCoroutine(victimText));
         StartCoroutine(FadeOutDestroyCoroutine(ShortBackground.GetComponent<Image>()));
         StartCoroutine(FadeOutDestroyCoroutine(LongBackground.GetComponent<Image>()));
-        yield return StartCoroutine(FadeOutDestroyCoroutine(weaponIcons[_gunIndex].GetComponent<Image>()));
+        Debug.Log(_gunIndex);
+        yield return StartCoroutine(FadeOutDestroyCoroutine(weaponIcons[_gunIndex == -1 ? weaponIcons.Length-1 : _gunIndex].GetComponent<Image>()));
         Destroy(gameObject);
     }
 

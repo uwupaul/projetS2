@@ -90,8 +90,10 @@ public class KillFeed : MonoBehaviourPunCallbacks
         
         yield return new WaitForSecondsRealtime(timeAlive);
 
-        go.GetComponent<KillFeedItem>().FadeOutDestroy();
-        //StartCoroutine(FadeOutDestroy(go));
+        if (go)
+            go.GetComponent<KillFeedItem>().FadeOutDestroy();
+            // pour pas avoir d'erreur si l'objet a déjà été destroy
+        
         itemList.Remove(go);
         
         ManageQueue();

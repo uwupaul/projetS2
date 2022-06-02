@@ -13,10 +13,7 @@ MonoBehaviour:
   m_Name: Sniper
   m_EditorClassIdentifier: 
   itemName: Rifle
+  itemIndex: 2
   damage: 100
-  shotSpread: 1
+  shotSpread: 2
   shotsPerSeconds: 0.5
-  isAutomatic: 0
-  canScope: 1
-  gunIndex: 2
-  canScopeOthers: 0

@@ -15,6 +15,7 @@ MonoBehaviour:
   itemName: Rifle
   damage: 100
   shotSpread: 1
-  shotsPerSeconds: 1
+  shotsPerSeconds: 0.5
   isAutomatic: 0
   canScope: 1
+  canScopeOthers: 0

@@ -45,6 +45,13 @@ public abstract class Item : MonoBehaviour
         textHealth = GameObject.Find("Canvas/BottomLeft/TextHealth");
         HealthBar = GameObject.Find("Canvas/BottomLeft/HealthBar");
         crossHair = GameObject.Find("Canvas/Crosshair");
+        
+        HealthBar.SetActive(true);
+        ui_username.SetActive(true);
+        ui_kills.SetActive(true);
+        ui_death.SetActive(true);
+        textHealth.SetActive(true);
+        crossHair.SetActive(true);
     }
 
     public void Scope()
@@ -64,8 +71,45 @@ public abstract class Item : MonoBehaviour
             UnScoped();
         }
     }
+    
+    public void SimpleScope()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            isScoped = !isScoped;
+            animator.SetBool("Scoped", isScoped);
+        }
 
-    void UnScoped()
+        if (isScoped)
+        {
+            StartCoroutine(SimpleScoped());
+        }
+        else
+        {
+            SimpleUnScoped();
+        }
+    }
+    
+    public void SimpleUnScoped()
+    {
+        crossHair.SetActive(true);
+        mainCam.fieldOfView = 70f;
+    }
+
+    IEnumerator SimpleScoped()
+    {
+        yield return new WaitForSeconds(.18f);
+
+        if (crossHair != null)
+        {
+            crossHair.SetActive(false);
+        }
+
+        normalFOV = mainCam.fieldOfView;
+        mainCam.fieldOfView = 55f;
+    }
+
+    public void UnScoped()
     {
         scopeOverlay.SetActive(false);
         weaponCamera.SetActive(true);
@@ -93,8 +137,12 @@ public abstract class Item : MonoBehaviour
         ui_kills.SetActive(false);
         ui_death.SetActive(false);
         textHealth.SetActive(false);
-        crossHair.SetActive(false);
-        
+
+        if (crossHair != null)
+        {
+            crossHair.SetActive(false);
+        }
+
         normalFOV = mainCam.fieldOfView;
         mainCam.fieldOfView = scopedDistance;
     }

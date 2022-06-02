@@ -15,5 +15,7 @@ MonoBehaviour:
   itemName: Pistol
   damage: 34
   shotSpread: 5
-  shotsPerSeconds: 4
+  shotsPerSeconds: 3
   isAutomatic: 0
+  canScope: 0
+  canScopeOthers: 0

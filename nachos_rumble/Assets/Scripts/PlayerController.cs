@@ -60,6 +60,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         
         public TextMeshPro playerUsername;
 
+        public AudioSource deathAudio;
+
     #endregion
     
     #region UI
@@ -96,7 +98,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             #endregion
             
             CharacterController.detectCollisions = false;
-            
+
             EquipItem(0);
             
             if (EscapeMod)
@@ -236,9 +238,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (((GunInfo) items[itemIndex].itemInfo).isAutomatic)
         {
             if (Input.GetMouseButton(0))
-            {
                 items[itemIndex].Use();
-            }
         }
         else
         {
@@ -250,7 +250,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             items[itemIndex].Scope();
         }
-
+        
+        if (Input.GetMouseButtonDown(1) && ((GunInfo) items[itemIndex].itemInfo).canScopeOthers)
+        {
+            items[itemIndex].SimpleScope();
+        }
+        
     }
     #endregion
 	public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
@@ -333,6 +338,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     void Die()
     {
+        deathAudio.Play();
         playerManager.Die();
+        items[itemIndex].UnScoped();
+        items[itemIndex].SimpleUnScoped();
     }
 }

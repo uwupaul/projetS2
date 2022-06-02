@@ -11,4 +11,5 @@ public class GunInfo : ItemInfo
     public float shotsPerSeconds;
     public bool isAutomatic;
     public bool canScope;
+    public bool canScopeOthers;
 }

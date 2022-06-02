@@ -12,4 +12,5 @@ public class GunInfo : ItemInfo
     public bool isAutomatic;
     public bool canScope;
     public int gunIndex;
+    public bool canScopeOthers;
 }

@@ -12,9 +12,13 @@ public class SingleShotGun : Gun
     private PhotonView PV;
     private bool canShoot = true;
 
+    public AudioSource shootingSound;
+
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
+        Debug.Log("tir son ici");
+        shootingSound.Stop();
     }
 
     public override void Use()
@@ -29,6 +33,11 @@ public class SingleShotGun : Gun
         {
             yield break;
         }
+        
+        Debug.Log("tir son");
+        shootingSound.Play();
+
+        Debug.Log("canShoot == true(?)");
         canShoot = false;
         //Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
         Ray ray = GetRayCast();
@@ -43,6 +52,8 @@ public class SingleShotGun : Gun
         var timeToWait = 1 / ((GunInfo) itemInfo).shotsPerSeconds;
         yield return new WaitForSecondsRealtime(timeToWait);
         canShoot = true;
+        
+        
     }
 
     Ray GetRayCast()

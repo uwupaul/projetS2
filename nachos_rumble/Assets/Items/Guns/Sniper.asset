@@ -17,3 +17,4 @@ MonoBehaviour:
   shotSpread: 1
   shotsPerSeconds: 1
   isAutomatic: 0
+  canScope: 1

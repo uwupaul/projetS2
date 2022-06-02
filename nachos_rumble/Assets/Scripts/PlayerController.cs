@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
     public GameObject cameraHolder;
     public GameObject cam;
+    
     PhotonView PV;
     PlayerManager playerManager;
 
@@ -235,12 +236,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (((GunInfo) items[itemIndex].itemInfo).isAutomatic)
         {
             if (Input.GetMouseButton(0))
+            {
                 items[itemIndex].Use();
+            }
         }
         else
         {
             if (Input.GetMouseButtonDown(0))
                 items[itemIndex].Use();
+        }
+        
+        if (Input.GetMouseButtonDown(1) && ((GunInfo) items[itemIndex].itemInfo).canScope)
+        {
+            items[itemIndex].Scope();
         }
 
     }

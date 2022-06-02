@@ -6,13 +6,24 @@ using UnityEngine.Audio;
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
 
 public class SettingsMenu : MonoBehaviourPunCallbacks
 {
     public AudioMixer audioMixer;
     [SerializeField] Slider masterVolumeSlider;
     [SerializeField] Slider mouseSensitivitySlider;
+    [SerializeField] TMP_Dropdown resolutionDropdown;
+    [SerializeField] Toggle FullScreenToggle;
     public float mouseSensitivity;
+
+    private Tuple<int,int>[] resolutions =
+    {
+        new Tuple<int, int>(2560, 1440),
+        new Tuple<int, int>(1920, 1080),
+        new Tuple<int, int>(1600, 900),
+        new Tuple<int, int>(1024, 576)
+    };
 
     bool _EscapeMod
     {
@@ -26,10 +37,28 @@ public class SettingsMenu : MonoBehaviourPunCallbacks
         audioMixer.GetFloat("MasterVolume",out masterVolume);
         
         masterVolumeSlider.value = masterVolume;
-        mouseSensitivity = 2;
+        mouseSensitivity = 1.5f;
         mouseSensitivitySlider.value = mouseSensitivity;
+        resolutionDropdown.value = FindCurrentResolution();
+        FullScreenToggle.isOn = Screen.fullScreen;
+        Debug.Log($"screen is full screen == {Screen.fullScreen}");
     }
 
+    int FindCurrentResolution()
+    {
+        for (int i = 0; i < resolutions.Length; i++) 
+        {
+            if (resolutions[i].Item1 == Screen.currentResolution.width &&
+                resolutions[i].Item2 == Screen.currentResolution.height)
+            {
+                Debug.Log($"found that the resolution was {resolutions[i].Item1}x{resolutions[i].Item2}");
+                return i;
+            }
+        }
+
+        return 0;
+    }
+    
     public void Toggle()
     {
         gameObject.SetActive(!gameObject.activeSelf);
@@ -56,22 +85,29 @@ public class SettingsMenu : MonoBehaviourPunCallbacks
     public void SetMasterVolume(float volume)
     {
         audioMixer.SetFloat("MasterVolume", volume);
-        Debug.Log($"SettingsMenu : SetMasterVolume to {volume}");
     }
 
     public void SetQuality(int qualityIndex)
     {
         QualitySettings.SetQualityLevel(qualityIndex);
-        Debug.Log($"SettingsMenu : SetQuality to {qualityIndex}");
     }
     
     
     public void SetMouseSensitivity(float sens)
     {
         mouseSensitivity = sens;
-        Debug.Log($"SettingsMenu : SetMouseSensitivity to {sens}");
     }
 
+    public void SetScreenResolution(int index)
+    {
+        Screen.SetResolution(resolutions[index].Item1, resolutions[index].Item2, Screen.fullScreen);
+    }
+
+    public void ToggleFullScreen(bool toggle)
+    {
+        Screen.fullScreen = toggle;
+    }
+    
     public void QuitGame()
     {
         Application.Quit();

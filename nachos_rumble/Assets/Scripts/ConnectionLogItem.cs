@@ -9,7 +9,7 @@ public class ConnectionLogItem : MonoBehaviourPun
     public void SetUp(Player player, bool connectionType)
     {
         DateTime date = DateTime.Now;
-        string time = $"{date.Hour}:{date.Minute}:{date.Second}";
-        text.text = $"{time} : {player.NickName} {(connectionType ? "entered" : "left")} the room.";
+        string time = $"[{date.Hour}h{date.Minute}m{date.Second}s]";
+        text.text = $"{time} {player.NickName} {(connectionType ? "entered" : "left")} the room.";
     }
 }

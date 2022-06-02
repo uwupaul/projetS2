@@ -59,7 +59,6 @@ public abstract class Item : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             isScoped = !isScoped;
-            animator.SetBool("Scoped", isScoped);
         }
 
         if (isScoped)
@@ -77,7 +76,6 @@ public abstract class Item : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             isScoped = !isScoped;
-            animator.SetBool("Scoped", isScoped);
         }
 
         if (isScoped)
@@ -92,25 +90,30 @@ public abstract class Item : MonoBehaviour
     
     public void SimpleUnScoped()
     {
+        animator.SetBool("Scoped", isScoped);
         crossHair.SetActive(true);
         mainCam.fieldOfView = 70f;
     }
 
     IEnumerator SimpleScoped()
     {
+        animator.SetBool("Scoped", isScoped);
+        
         yield return new WaitForSeconds(.18f);
 
         if (crossHair != null)
         {
             crossHair.SetActive(false);
         }
-
+        
         normalFOV = mainCam.fieldOfView;
         mainCam.fieldOfView = 55f;
     }
 
     public void UnScoped()
     {
+        animator.SetBool("Scoped", isScoped);
+        
         scopeOverlay.SetActive(false);
         weaponCamera.SetActive(true);
         
@@ -127,8 +130,10 @@ public abstract class Item : MonoBehaviour
 
     IEnumerator Scoped()
     {
-        yield return new WaitForSeconds(.18f);
+        animator.SetBool("Scoped", isScoped);
         
+        yield return new WaitForSeconds(.18f);
+
         scopeOverlay.SetActive(true);
         weaponCamera.SetActive(false);
         

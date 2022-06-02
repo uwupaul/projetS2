@@ -230,6 +230,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             if (Input.GetKeyDown((i + 1).ToString()))
             {
+                items[itemIndex].isScoped = false;
+                if (((GunInfo) items[itemIndex].itemInfo).canScope)
+                {
+                    items[itemIndex].UnScoped();
+                }
+                if (((GunInfo) items[itemIndex].itemInfo).canScopeOthers)
+                {
+                    items[itemIndex].SimpleUnScoped();
+                }
                 EquipItem(i);
                 break;
             }

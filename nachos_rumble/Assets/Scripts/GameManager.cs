@@ -74,9 +74,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         newPlayer.SetCustomProperties(H1);
         newPlayer.SetCustomProperties(H2);
 
-        Debug.Log($"GM : Reset stats of {PV.Owner.NickName}");
-        Debug.Log($"GM : Kills of {newPlayer.NickName} : {newPlayer.CustomProperties["Kills"]}");
-        Debug.Log($"GM : Deaths of {newPlayer.NickName} : {newPlayer.CustomProperties["Deaths"]}");
+        //Debug.Log($"GM : Reset stats of {PV.Owner.NickName}");
+        //Debug.Log($"GM : Kills of {newPlayer.NickName} : {newPlayer.CustomProperties["Kills"]}");
+        //Debug.Log($"GM : Deaths of {newPlayer.NickName} : {newPlayer.CustomProperties["Deaths"]}");
     }
 
     [PunRPC]

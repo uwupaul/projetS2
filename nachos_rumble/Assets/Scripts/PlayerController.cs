@@ -113,6 +113,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
         else
             Destroy(GetComponentInChildren<Camera>().gameObject);
+        
+        
     }
 
     void Update()

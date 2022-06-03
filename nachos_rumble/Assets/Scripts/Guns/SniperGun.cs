@@ -99,6 +99,8 @@ public class SniperGun : Gun
                 yield break;
 
             shootingSound.Play();
+            AudioManager.Instance.SendSound(shootingSound, ((GunInfo) itemInfo).itemIndex);
+            
             canShoot = false;
             
             Ray ray = GetRayCast();

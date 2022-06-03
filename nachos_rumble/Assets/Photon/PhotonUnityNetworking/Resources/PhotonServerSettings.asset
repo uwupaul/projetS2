@@ -47,6 +47,7 @@ MonoBehaviour:
   - RPC_EndGame
   - RPC_SyncWeapon
   - RPC_KillFeedEntry
+  - RPC_PlaySound
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

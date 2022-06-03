@@ -9,6 +9,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 {
     PhotonView PV;
     GameObject controller;
+    
+    public AudioSource SpawnSound;
+    public AudioSource DeathSound;
 
     private void Awake()
     {
@@ -27,10 +30,15 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     {
         Transform spawnpoint = SpawnManager.Instance.GetSpawnPoint();
         controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs","PlayerController"),spawnpoint.position,spawnpoint.rotation, 0, new object[] { PV.ViewID });
+        
+        AudioManager.Instance.SendSound(3, SpawnSound.minDistance, SpawnSound.maxDistance, spawnpoint.position);
     }
 
     public void Die()
     {
+        Vector3 position = controller.GetComponent<CharacterController>().transform.position;
+        
+        AudioManager.Instance.SendSound(4, DeathSound.minDistance, DeathSound.maxDistance, position);
         PhotonNetwork.Destroy(controller);
         CreateController();
         ApplyDeath();

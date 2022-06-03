@@ -23,7 +23,6 @@ public class AutomaticGun : Gun
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
-        shootingSound.Stop();
     }
 
     private void Start()
@@ -105,6 +104,8 @@ public class AutomaticGun : Gun
                 yield break;
 
             shootingSound.Play();
+            AudioManager.Instance.SendSound(shootingSound, ((GunInfo) itemInfo).itemIndex);
+            
             canShoot = false;
             
             Ray ray = GetRayCast();

@@ -6,21 +6,21 @@ using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
-using PlayerData;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
     PhotonView PV;
-    public int scoreToWin = 5;
+    public int scoreToWin;
     Player GameWinner;
-    public static GameManager Instance;
     private bool gameEnded;
     
+    public static GameManager Instance;
+
     #region EndScreen
-    [SerializeField] GameObject EndScreen;
-    [SerializeField] Text TitleText;
-    [SerializeField] Text subTitleText;
+        [SerializeField] GameObject EndScreen;
+        [SerializeField] Text TitleText;
+        [SerializeField] Text subTitleText;
     #endregion
 
     void Awake()
@@ -30,7 +30,6 @@ public class GameManager : MonoBehaviourPunCallbacks
             Destroy(gameObject); // il ne peut y en avoir que un 
             return;
         }
-        //DontDestroyOnLoad(gameObject); // il est le seul.
         Instance = this;
         
         PV = GetComponent<PhotonView>();
@@ -44,39 +43,34 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (!PV.IsMine || gameEnded)
             return;
         
-        if (changedProps.ContainsKey("Kills"))
+        if (changedProps.ContainsKey("K"))
         {
-            //Debug.Log($"{targetPlayer} has {(int)changedProps["Kills"]} eliminations.");
-            
-            if ((int) changedProps["Kills"] >= scoreToWin)
+            if ((int) changedProps["K"] >= scoreToWin)
             {
                 gameEnded = true;
                 GameWinner = targetPlayer;
                 PV.RPC("RPC_EndGame", RpcTarget.All, GameWinner);
             }
         }
-        
-        if (changedProps.ContainsKey("Deaths"))
-            Debug.Log($"{targetPlayer} has {(int)changedProps["Deaths"]} deaths.");
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         if (gameEnded && PV.Owner.IsMasterClient)
             PhotonNetwork.CloseConnection(newPlayer); // pour le kick
+        
+        // En théorie ca serait mieux de créer une properties de Room 'gameEnded', et si elle est True, la room disparait
+        // dans la liste de room des menus
+        
 
         Hashtable H1 = new Hashtable();
         Hashtable H2 = new Hashtable();
 
-        H1.Add("Kill", 0);
-        H2.Add("Death", 0);
+        H1.Add("K", 0);
+        H2.Add("D", 0);
 
         newPlayer.SetCustomProperties(H1);
         newPlayer.SetCustomProperties(H2);
-
-        //Debug.Log($"GM : Reset stats of {PV.Owner.NickName}");
-        //Debug.Log($"GM : Kills of {newPlayer.NickName} : {newPlayer.CustomProperties["Kills"]}");
-        //Debug.Log($"GM : Deaths of {newPlayer.NickName} : {newPlayer.CustomProperties["Deaths"]}");
     }
 
     [PunRPC]
@@ -84,15 +78,15 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         StartCoroutine(EndGame(winner)); 
     }
-
-
+    
     IEnumerator EndGame(Player winner)
     {
         DisplayEndScreen(winner);
+
+        Debug.Log(PlayerData.Instance.globalDeaths);
+        Debug.Log(PlayerData.Instance.globalKills);
         
-        Debug.Log(Launcher.myProfile.globalDeath);
-        Debug.Log(Launcher.myProfile.globalKill);
-        Data.SaveProfile(Launcher.myProfile);
+        PlayerData.Instance.SaveProfile();
 
         for (int i = 8; i > 0; i--)
         {
@@ -110,7 +104,6 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         TitleText.text = $"{winner.NickName} won the game !";
         EndScreen.SetActive(true);
-        Debug.Log($"{winner} has won the game !!");
     }
     
     void QuitRoom()
@@ -125,7 +118,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         // on set le parent du RoomManager comme un objet qui lui est détruit OnSceneLoaded
         
         PhotonNetwork.LoadLevel(0);
-        Debug.Log($"SettingsMenu : OnLeftRoom");
         SettingsMenu.EnableMouse();
         Destroy(gameObject);
     }

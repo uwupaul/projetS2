@@ -8,6 +8,7 @@ TagManager:
   - FxTemporaire
   - Camera
   - Map
+  - Damageable
   layers:
   - Default
   - TransparentFX

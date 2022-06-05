@@ -47,9 +47,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     private void ApplyDeath()
     {
         Hashtable H = new Hashtable();
-        int deathOfParent = Convert.ToInt32(PV.Owner.CustomProperties["Death"]);
+        int deathOfParent = Convert.ToInt32(PV.Owner.CustomProperties["D"]);
         
-        H.Add("Death", deathOfParent + 1);
+        H.Add("D", deathOfParent + 1);
         PV.Owner.SetCustomProperties(H);
     }
 }

@@ -4,48 +4,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
-using PlayerData;
 using TMPro;
 using Random = UnityEngine.Random;
 using UnityEngine.UI;
 
-
-[System.Serializable]
-public class ProfileData
-{
-    public string username;
-    public int level;
-    public int xp;
-    public int globalKill;
-    public int globalDeath;
-
-    public ProfileData() //profile par defaut
-    {
-        this.username = "";
-        this.level = 0;
-        this.xp = 0;
-        this.globalDeath = 0;
-        this.globalKill = 0;
-    }
-
-    public ProfileData(string u, int l, int x, int k, int d)
-    {
-        this.username = u;
-        this.level = l;
-        this.xp = x;
-        this.globalDeath = d;
-        this.globalKill = k;
-    }
-}
 public class Launcher : MonoBehaviourPunCallbacks
 {
     public InputField usernameField;
     [SerializeField] Text globalKillsField;
     [SerializeField] Text globalDeathsField;
     [SerializeField] Text KDField;
-    public static ProfileData myProfile = new ProfileData();
-
-    private PhotonView PV;
     
     public static Launcher launcher;
 
@@ -57,22 +25,14 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] GameObject roomListItemPrefab;
     [SerializeField] GameObject playerListItemPrefab;
     [SerializeField] GameObject startGameButton;
-    private void Awake()
-    {
-        launcher = this;
-
-        myProfile = Data.LoadProfile(); //charger notre profile
-        usernameField.text = myProfile.username;
-        globalKillsField.text = "Kills : " + myProfile.globalKill;
-        globalDeathsField.text = "Deaths : " + myProfile.globalDeath;
-        float kd = (float) myProfile.globalKill /  myProfile.globalDeath;
-        KDField.text = "K/D : " + $"{kd:0.00}";
-        PhotonNetwork.NickName = myProfile.username;
-    }
+    
+    // Faire que quand on clique sur FindRoom ou CreateRoom : 
+    // si on a set de username, alors on a un petit pop up qui apparaît pour nous le dire, avec un bouton OK qui ferme tout
 
     void Start()
     {
         Debug.Log("Connecting to Master");
+        
         if (PhotonNetwork.InRoom)
         {
             PhotonNetwork.LeaveRoom();
@@ -88,6 +48,26 @@ public class Launcher : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.ConnectUsingSettings();
         }
+        
+        launcher = this;
+
+        PlayerData.Instance.LoadProfile(); //charger notre profileData
+        
+        float kd = PlayerData.Instance.globalDeaths == 0 ? PlayerData.Instance.globalKills :
+            (float) PlayerData.Instance.globalKills /  PlayerData.Instance.globalDeaths;
+        
+        usernameField.text = PlayerData.Instance.username;
+        globalKillsField.text = "Kills : " + PlayerData.Instance.globalKills;
+        globalDeathsField.text = "Deaths : " + PlayerData.Instance.globalDeaths;
+        KDField.text = "K/D : " + $"{kd:0.00}";
+        
+        PhotonNetwork.NickName = PlayerData.Instance.username;
+    }
+    
+    public void ChangeUsername(string username)
+    {
+        PlayerData.Instance.username = username;
+        PhotonNetwork.NickName = username;
     }
 
     public override void OnConnectedToMaster()
@@ -99,11 +79,8 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
-        Debug.Log(usernameField.text);
-        
         MenuManager.menuManager.OpenMenu("title");
         Debug.Log("Joined Lobby");
-         //pour le moment A FIX !! , demande a paul
     }
 
     public void CreateRoom()
@@ -119,27 +96,16 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         MenuManager.menuManager.OpenMenu("room");
         roomNameText.text = PhotonNetwork.CurrentRoom.Name;
-        
-        if (string.IsNullOrEmpty(usernameField.text)) // pour les pseudos
-        {
-            myProfile.username = "PLAYER_" + Random.Range(100, 1000);
-            PhotonNetwork.NickName = myProfile.username;
-        }
-        else
-        {
-            myProfile.username = usernameField.text;
-            PhotonNetwork.NickName = myProfile.username;
-        }
-        
-        Data.SaveProfile(myProfile); // save le profile
 
         foreach (Transform child in playerListContent)
         {
+            // On détruit tout ce qui est déjà présent dans la liste de joueur (pour reset)
             Destroy(child.gameObject);
         }
         
         foreach (Player player in PhotonNetwork.PlayerList)
         {
+            // On reconstruit la liste de joueur
             Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(player);
         }
         
@@ -159,15 +125,6 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public void JoinRoom(RoomInfo info)
     {
-        if (string.IsNullOrEmpty(usernameField.text)) // pour les pseudos
-        {
-            myProfile.username = "PLAYER_" + Random.Range(100, 1000);
-        }
-        else
-        {
-            myProfile.username = usernameField.text;
-        }
-        
         PhotonNetwork.JoinRoom(info.Name);
         MenuManager.menuManager.OpenMenu("loading");
     }
@@ -203,16 +160,6 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public void StartGame()
     {
-        if (string.IsNullOrEmpty(usernameField.text)) // pour les pseudos
-        {
-            myProfile.username = "PLAYER_" + Random.Range(100, 1000);
-        }
-        else
-        {
-            myProfile.username = usernameField.text;
-        }
-        Data.SaveProfile(myProfile); // save le profile
-        
         PhotonNetwork.LoadLevel(1); // load la scène d'index 1 (le jeu)
     }
 

@@ -72,7 +72,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     float mouseSensitivity => UIM.settingsMenu.mouseSensitivity;
     #endregion
     
-    [HideInInspector] public ProfileData playerProfile;
     
     void Awake()
     {
@@ -91,14 +90,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 ui_death = GameObject.Find("Canvas/TopLeft/DeathText").GetComponent<TextMeshProUGUI>();
                 textHealth = GameObject.Find("Canvas/BottomLeft/TextHealth").GetComponent<TextMeshProUGUI>();
                 HealthBar = GameObject.Find("Canvas/BottomLeft/HealthBar").GetComponent<HealthBar>();
-
+                KillFeed = GameObject.Find("Canvas/KillFeed").GetComponent<KillFeed>();
+                
+                
                 HealthBar.SetMaxHealth(MaxHealth);
                 textHealth.text = MaxHealth.ToString();
                 textHealth.color = Color.white;
-                ui_username.text = Launcher.myProfile.username; // ou Photon.Nickname ?
-                playerUsername.text = Launcher.myProfile.username;
-
-                KillFeed = GameObject.Find("Canvas/KillFeed").GetComponent<KillFeed>();
+                ui_username.text = PV.Owner.NickName;
+                playerUsername.text = PV.Owner.NickName; //Launcher.myProfile.username;
             #endregion
             
             CharacterController.detectCollisions = false;
@@ -113,8 +112,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
         else
             Destroy(GetComponentInChildren<Camera>().gameObject);
-        
-        
     }
 
     void Update()
@@ -153,13 +150,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             Die();
     }
 
+    /*
+    Pas besoin de synchroniser le profile de chaque joueur ingame si ?
+     
     [PunRPC]
-    private void SyncProfile(string p_username, int p_level, int p_xp, int p_globalKills, int p_globalDeaths) //profil de chq player (username in game)
+    private void SyncProfile(string username, int kills, int deaths) //profil de chq player (username in game)
     {
-        playerProfile = new ProfileData(p_username,p_level,p_xp,p_globalKills,p_globalDeaths);
-        playerUsername.text = playerProfile.username;
+        playerProfile = new PlayerData(username,kills,deaths);
     }
-    
+    */
 
     #region Physics Method
     
@@ -277,27 +276,25 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (!PV.IsMine)
             return;
         
-        if (changedProps.ContainsKey("Death"))
+        if (changedProps.ContainsKey("D"))
         {
-            Debug.Log($"PC : {targetPlayer.NickName} died {(int)changedProps["Death"]} times.");
+            Debug.Log($"PC : {targetPlayer.NickName} died {(int)changedProps["D"]} times.");
             
             if (targetPlayer == PV.Owner)
             {
-                Launcher.myProfile.globalDeath += 1;
-                //text death
-                ui_death.text = "DEATHS : " + Convert.ToString((int)changedProps["Death"]);
+                PlayerData.Instance.globalDeaths += 1;
+                ui_death.text = "DEATHS : " + Convert.ToString((int)changedProps["D"]);
             }
         }
 
-        if (changedProps.ContainsKey("Kills"))
+        if (changedProps.ContainsKey("K"))
         {
-            Debug.Log($"PC : {targetPlayer.NickName} has {(int) changedProps["Kills"]} kills.");
+            Debug.Log($"PC : {targetPlayer.NickName} has {(int) changedProps["K"]} kills.");
 
             if (targetPlayer == PV.Owner)
             {
-                Launcher.myProfile.globalKill += 1;
-                //text kills
-                ui_kills.text = "KILLS : " + Convert.ToString((int)changedProps["Kills"]);
+                PlayerData.Instance.globalKills += 1;
+                ui_kills.text = "KILLS : " + Convert.ToString((int)changedProps["K"]);
             }
         }
     }
@@ -340,9 +337,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     void ApplyKill(Player player)
     {
         Hashtable H = new Hashtable();
-        int deathOfParent = Convert.ToInt32(player.CustomProperties["Kills"]);
+        int deathOfParent = Convert.ToInt32(player.CustomProperties["K"]);
         
-        H.Add("Kills", deathOfParent + 1);
+        H.Add("K", deathOfParent + 1);
         player.SetCustomProperties(H);
     }
 

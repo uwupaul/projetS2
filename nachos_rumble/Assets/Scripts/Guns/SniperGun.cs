@@ -105,11 +105,14 @@ public class SniperGun : Gun
             
             Ray ray = GetRayCast();
             ray.origin = mainCam.transform.position;
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            if (Physics.Raycast(ray, out RaycastHit hit)) 
             {
-                hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo) itemInfo).damage, PV.Owner, ((GunInfo) itemInfo).itemIndex);
-                if (!hit.collider.gameObject.CompareTag("Player") && !hit.collider.gameObject.CompareTag("Camera"))
-                    PV.RPC("RPC_Shoot",RpcTarget.All, hit.point,hit.normal);
+                if (!hit.collider.gameObject.CompareTag("Damageable"))
+                {
+                    hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo) itemInfo).damage, PV.Owner, ((GunInfo) itemInfo).itemIndex);
+                    if (!hit.collider.gameObject.CompareTag("Player") && !hit.collider.gameObject.CompareTag("Camera"))
+                        PV.RPC("RPC_Shoot", RpcTarget.All, hit.point, hit.normal);
+                }
             }
 
             var timeToWait = 1 / ((GunInfo) itemInfo).shotsPerSeconds;

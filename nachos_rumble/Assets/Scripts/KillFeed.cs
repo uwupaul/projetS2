@@ -32,7 +32,6 @@ public class KillFeed : MonoBehaviourPunCallbacks
 
     /* TODO
      
-     - fix le fadeout qui ne marche pas
      - rajouter l'icon des maracas quand on les aura mises
     */
 
@@ -45,7 +44,7 @@ public class KillFeed : MonoBehaviourPunCallbacks
     {
         Debug.Log("KillFeedItem : KillFeedEntry");
         
-        PV.RPC("RPC_KillFeedEntry", RpcTarget.All, PV.Owner, murderer, gunIndex);
+        PV.RPC("RPC_KillFeedEntry", RpcTarget.All, victim, murderer, gunIndex);
     }
 
 

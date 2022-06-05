@@ -67,11 +67,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     #endregion
     
     #region UI
-    UIManager UIM;
-    bool EscapeMod => UIM.EscapeMod;
-    float mouseSensitivity => UIM.settingsMenu.mouseSensitivity;
+        UIManager UIM;
+        bool EscapeMod => UIM.EscapeMod;
+        float mouseSensitivity => UIM.settingsMenu.mouseSensitivity;
     #endregion
-    
     
     void Awake()
     {
@@ -111,11 +110,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 SettingsMenu.DisableMouse();
         }
         else
+        {
             Destroy(GetComponentInChildren<Camera>().gameObject);
+        }
     }
 
     void Update()
     {
+        Debug.Log($"CC Y velocity : {CharacterController.velocity.y}, X : {CharacterController.velocity.x}");
+        
         if(!PV.IsMine)
             return;
         
@@ -244,16 +247,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                     items[previousItemIndex].Unequip();
 
                 previousItemIndex = itemIndex;
-
-                /*
-                if (itemIndex != -1)
-                    items[itemIndex].Unequip();
-
-                previousItemIndex = itemIndex;
-                itemIndex = i;
-                items[itemIndex].Equip();
-                break;
-                */
             }
         }
 
@@ -281,10 +274,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             Debug.Log($"PC : {targetPlayer.NickName} died {(int)changedProps["D"]} times.");
             
             if (targetPlayer == PV.Owner)
-            {
-                PlayerData.Instance.globalDeaths += 1;
                 ui_death.text = "DEATHS : " + Convert.ToString((int)changedProps["D"]);
-            }
         }
 
         if (changedProps.ContainsKey("K"))
@@ -292,10 +282,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             Debug.Log($"PC : {targetPlayer.NickName} has {(int) changedProps["K"]} kills.");
 
             if (targetPlayer == PV.Owner)
-            {
-                PlayerData.Instance.globalKills += 1;
                 ui_kills.text = "KILLS : " + Convert.ToString((int)changedProps["K"]);
-            }
         }
     }
 
@@ -341,6 +328,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         
         H.Add("K", deathOfParent + 1);
         player.SetCustomProperties(H);
+
+        PlayerData.Instance.globalKills++;
     }
 
     void Die()

@@ -108,12 +108,13 @@ public class SettingsMenu : MonoBehaviourPunCallbacks
     
     public void QuitGame()
     {
+        PlayerData.Instance.SaveProfile();
         Application.Quit();
     }
     
     public void QuitRoom()
     {
-        //Destroy(RoomManager.Instance.gameObject);
+        PlayerData.Instance.SaveProfile();
         PhotonNetwork.LeaveRoom();
     }
 }

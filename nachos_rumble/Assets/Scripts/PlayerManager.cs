@@ -51,5 +51,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         
         H.Add("D", deathOfParent + 1);
         PV.Owner.SetCustomProperties(H);
+        
+        PlayerData.Instance.globalDeaths++;
     }
 }

@@ -25,6 +25,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] GameObject roomListItemPrefab;
     [SerializeField] GameObject playerListItemPrefab;
     [SerializeField] GameObject startGameButton;
+    [SerializeField] GameObject NoUsernamePopup;
     
     // Faire que quand on clique sur FindRoom ou CreateRoom : 
     // si on a set de username, alors on a un petit pop up qui apparaît pour nous le dire, avec un bouton OK qui ferme tout
@@ -63,12 +64,6 @@ public class Launcher : MonoBehaviourPunCallbacks
         
         PhotonNetwork.NickName = PlayerData.Instance.username;
     }
-    
-    public void ChangeUsername(string username)
-    {
-        PlayerData.Instance.username = username;
-        PhotonNetwork.NickName = username;
-    }
 
     public override void OnConnectedToMaster()
     {
@@ -92,10 +87,27 @@ public class Launcher : MonoBehaviourPunCallbacks
         }
     }
 
+    public void ChangeUsername(string username)
+    {
+        PlayerData.Instance.username = username;
+        PhotonNetwork.NickName = username;
+        PlayerData.Instance.SaveProfile();
+    }
+    
+    public void UsernameCheck(string menu)
+    {
+        ChangeUsername(usernameField.text);
+        
+        if (string.IsNullOrEmpty(PlayerData.Instance.username))
+            NoUsernamePopup.SetActive(true);
+        else
+            MenuManager.menuManager.OpenMenu(menu);
+    }
+    
     public override void OnJoinedRoom()
     {
-        MenuManager.menuManager.OpenMenu("room");
         roomNameText.text = PhotonNetwork.CurrentRoom.Name;
+        MenuManager.menuManager.OpenMenu("room");
 
         foreach (Transform child in playerListContent)
         {

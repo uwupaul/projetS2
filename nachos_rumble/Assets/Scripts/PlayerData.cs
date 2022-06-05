@@ -4,7 +4,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using ExitGames.Client.Photon.StructWrapping;
+
+[Serializable] public class Data
+{
+    public string username;
+    public int globalKills;
+    public int globalDeaths;
+
+    public static PlayerData Instance;
+
+    public Data() //profil par defaut
+    {
+        username = "";
+        globalDeaths = 0;
+        globalKills = 0;
+    }
+
+    public Data(string u, int k, int d)
+    {
+        username = u;
+        globalDeaths = d;
+        globalKills = k;
+    }
+}
 
 public class PlayerData : MonoBehaviour
 {
@@ -35,6 +57,7 @@ public class PlayerData : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        DontDestroyOnLoad(gameObject);
         Instance = this;
     }
 
@@ -48,6 +71,21 @@ public class PlayerData : MonoBehaviour
 
     public void SaveProfile()
     {
+        string path = Application.persistentDataPath + "/profile.dt";
+
+        if (File.Exists(path))
+            File.Delete(path);
+
+
+        FileStream file = File.Create(path);
+        var bf = new BinaryFormatter();
+
+        bf.Serialize(file, new Data(username, globalKills, globalDeaths));
+        file.Close();
+
+        Debug.Log("SUCCESS in SaveProfile()");
+
+        /*
         try {
             string path = Application.persistentDataPath + "/profile.dt";
 
@@ -55,9 +93,9 @@ public class PlayerData : MonoBehaviour
                 File.Delete(path);
 
             FileStream file = File.Create(path);
-
-            BinaryFormatter bf = new BinaryFormatter();
+            var bf = new BinaryFormatter();
             bf.Serialize(file, this);
+
             file.Close();
                 
             Debug.Log("SAVED SUCCESSFULLY");
@@ -65,6 +103,7 @@ public class PlayerData : MonoBehaviour
         catch {
             Debug.Log("Error in 'SaveProfile()'");
         }
+        */
     }
     public void LoadProfile()
     {
@@ -75,17 +114,23 @@ public class PlayerData : MonoBehaviour
             {
                 FileStream file = File.Open(path, FileMode.Open);
                 BinaryFormatter bf = new BinaryFormatter();
-                var loadedData = (PlayerData) bf.Deserialize(file);
+                var loadedDat = bf.Deserialize(file);
+                Debug.Log("abababa");
+                var loadedData = (Data) loadedDat;
 
                 username = loadedData.username;
                 globalKills = loadedData.globalKills;
                 globalDeaths = loadedData.globalDeaths;
+                
+                Debug.Log(loadedData.username);
+                Debug.Log(loadedData.globalDeaths);
+                Debug.Log(loadedData.globalKills);
             }
                 
-            Debug.Log("LOAD SUCCESSFULLY");
+            Debug.Log("SUCCESS in LoadProfile()");
         }
         catch {
-            Debug.Log("Error in 'LoadProfile()'");
+            Debug.Log("Error in LoadProfile()");
         }
     }
 }

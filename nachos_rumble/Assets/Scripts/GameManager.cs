@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
@@ -33,11 +34,25 @@ public class GameManager : MonoBehaviourPunCallbacks
         Instance = this;
         
         PV = GetComponent<PhotonView>();
+    }
+
+    private void Start()
+    {
+        Debug.Log($"PV of GameManager is :{PV.Owner is null}");
 
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 120;
+        
+        Hashtable H1 = new Hashtable();
+        Hashtable H2 = new Hashtable();
+
+        H1.Add("K", 0);
+        H2.Add("D", 0);
+
+        PhotonNetwork.LocalPlayer.SetCustomProperties(H1);
+        PhotonNetwork.LocalPlayer.SetCustomProperties(H2);
     }
-    
+
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
     {
         if (!PV.IsMine || gameEnded)
@@ -61,16 +76,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         
         // En théorie ca serait mieux de créer une properties de Room 'gameEnded', et si elle est True, la room disparait
         // dans la liste de room des menus
-        
-
-        Hashtable H1 = new Hashtable();
-        Hashtable H2 = new Hashtable();
-
-        H1.Add("K", 0);
-        H2.Add("D", 0);
-
-        newPlayer.SetCustomProperties(H1);
-        newPlayer.SetCustomProperties(H2);
     }
 
     [PunRPC]

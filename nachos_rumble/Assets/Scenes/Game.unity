@@ -2706,7 +2706,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecd428b186da9454d9999a8d980dea9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreToWin: 20
+  scoreToWin: 5
   EndScreen: {fileID: 256108152}
   TitleText: {fileID: 888805130}
   subTitleText: {fileID: 632766197}
@@ -2986,7 +2986,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1352006369
 MonoBehaviour:
   m_ObjectHideFlags: 0

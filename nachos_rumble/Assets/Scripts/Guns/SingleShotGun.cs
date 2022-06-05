@@ -15,20 +15,12 @@ public class SingleShotGun : Gun
 
     public AudioSource shootingSound;
     public Animator animator;
-    private GameObject crossHair;
 
-    public float AdsFOV;
-    public float HipFOV;
     
 
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
-    }
-
-    private void Start()
-    {
-        crossHair = GameObject.Find("Canvas/Crosshair");
     }
 
     private void Update()
@@ -38,10 +30,6 @@ public class SingleShotGun : Gun
 
         if (Input.GetMouseButtonDown(0))
             StartCoroutine(Shoot());
-
-        if (Input.GetMouseButtonDown(1))
-            ToggleScope();
-        
     }
 
     public override void Equip()
@@ -63,38 +51,7 @@ public class SingleShotGun : Gun
     {
         isEquiped = false;
         itemGameObject.SetActive(false);
-        canShoot = false;
-
-        cam.fieldOfView = HipFOV;
-        Unscope();
     }
-
-    #region Scope
-        public void ToggleScope()
-        {
-            isScoped = !isScoped;
-
-            if (isScoped)
-                StartCoroutine(ScopeCoroutine());
-            else
-                Unscope();
-        }
-        
-        public void Unscope()
-        {
-            animator.SetBool("Scoped", false);
-            crossHair.SetActive(true);
-            cam.fieldOfView = HipFOV;
-        }
-
-        IEnumerator ScopeCoroutine()
-        {
-            animator.SetBool("Scoped", isScoped);
-            yield return new WaitForSeconds(.18f);
-            crossHair.SetActive(false);
-            cam.fieldOfView = AdsFOV; // mettre une animation pour que ca soit plus fluide?
-        }
-    #endregion
 
     #region ShootMethods
         IEnumerator Shoot()
@@ -111,13 +68,9 @@ public class SingleShotGun : Gun
             ray.origin = cam.transform.position;
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                if (!hit.collider.gameObject.CompareTag("Damageable"))
-                {
-                    hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo) itemInfo).damage,
-                        PV.Owner, ((GunInfo) itemInfo).itemIndex);
-                    if (!hit.collider.gameObject.CompareTag("Player") && !hit.collider.gameObject.CompareTag("Camera"))
-                        PV.RPC("RPC_Shoot", RpcTarget.All, hit.point, hit.normal);
-                }
+                hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo) itemInfo).damage, PV.Owner, ((GunInfo) itemInfo).itemIndex);
+                if (!hit.collider.gameObject.CompareTag("Player") && !hit.collider.gameObject.CompareTag("Camera"))
+                    PV.RPC("RPC_Shoot", RpcTarget.All, hit.point, hit.normal);
             }
 
             var timeToWait = 1 / ((GunInfo) itemInfo).shotsPerSeconds;

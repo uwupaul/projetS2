@@ -88,7 +88,6 @@ public class SniperGun : Gun
     {
         isEquiped = false;
         itemGameObject.SetActive(false);
-        canShoot = false;
         Unscope();
     }
 
@@ -107,12 +106,9 @@ public class SniperGun : Gun
             ray.origin = mainCam.transform.position;
             if (Physics.Raycast(ray, out RaycastHit hit)) 
             {
-                if (!hit.collider.gameObject.CompareTag("Damageable"))
-                {
-                    hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo) itemInfo).damage, PV.Owner, ((GunInfo) itemInfo).itemIndex);
-                    if (!hit.collider.gameObject.CompareTag("Player") && !hit.collider.gameObject.CompareTag("Camera"))
-                        PV.RPC("RPC_Shoot", RpcTarget.All, hit.point, hit.normal);
-                }
+                hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo) itemInfo).damage, PV.Owner, ((GunInfo) itemInfo).itemIndex);
+                if (!hit.collider.gameObject.CompareTag("Player") && !hit.collider.gameObject.CompareTag("Camera"))
+                    PV.RPC("RPC_Shoot", RpcTarget.All, hit.point, hit.normal);
             }
 
             var timeToWait = 1 / ((GunInfo) itemInfo).shotsPerSeconds;

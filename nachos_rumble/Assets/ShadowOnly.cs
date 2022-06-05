@@ -13,7 +13,7 @@ public class ShadowOnly : MonoBehaviour
             return;
 
         var Renderer = GetComponent<SkinnedMeshRenderer>();
-        //Renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+        Renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
     }
 }
 

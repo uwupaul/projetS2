@@ -117,11 +117,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     void Update()
     {
-        Debug.Log($"CC Y velocity : {CharacterController.velocity.y}, X : {CharacterController.velocity.x}");
-        
+        //Debug.Log($"CC Y velocity : {CharacterController.velocity.y}, X : {CharacterController.velocity.x}");
+
         if(!PV.IsMine)
             return;
-        
+
         #region Movement
             wasGrounded = grounded;
             grounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);

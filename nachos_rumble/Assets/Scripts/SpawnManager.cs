@@ -5,8 +5,8 @@ using UnityEngine;
 public class SpawnManager : MonoBehaviour
 {
     public static SpawnManager Instance;
-    private SpawnPoint[] spawnpoints;
-    public float securityDistance = 3f;
+    public SpawnPoint[] spawnpoints;
+    public float securityDistance;
 
     private void Awake()
     {
@@ -17,10 +17,14 @@ public class SpawnManager : MonoBehaviour
     public Transform GetSpawnPoint()
     {
         Transform t;
-        do {
-            t = spawnpoints[Random.Range(0, spawnpoints.Length)].transform;
+        int index;
+        do
+        {
+            index = Random.Range(0, spawnpoints.Length);
+            t = spawnpoints[index].transform;
         } while (!IsSpawnValid(t));
-
+        
+        Debug.Log($"Spawned at spawn index {index}");
         return t;
     }
 

@@ -33,6 +33,7 @@ public class PlayerAnimation : MonoBehaviour
             return;
         
         var v = transform.InverseTransformDirection(CharacterController.velocity);
+        //Debug.Log($"CC Z velocity : {v.z}, X : {v.x}");
             
         Animator.SetFloat(zVelHash, v.z);
         Animator.SetFloat(xVelHash, v.x);

@@ -96,7 +96,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 textHealth.text = MaxHealth.ToString();
                 textHealth.color = Color.white;
                 ui_username.text = PV.Owner.NickName;
-                playerUsername.text = PV.Owner.NickName; //Launcher.myProfile.username;
+                playerUsername.text = PV.Owner.NickName;
             #endregion
             
             CharacterController.detectCollisions = false;
@@ -117,7 +117,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     void Update()
     {
-        Debug.Log($"CC Y velocity : {CharacterController.velocity.y}, X : {CharacterController.velocity.x}");
+        //var v = transform.InverseTransformDirection(CharacterController.velocity);
+        //Debug.Log($"CC Z velocity : {v.z}, X : {v.x}");
         
         if(!PV.IsMine)
             return;
@@ -153,16 +154,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             Die();
     }
 
-    /*
-    Pas besoin de synchroniser le profile de chaque joueur ingame si ?
-     
-    [PunRPC]
-    private void SyncProfile(string username, int kills, int deaths) //profil de chq player (username in game)
-    {
-        playerProfile = new PlayerData(username,kills,deaths);
-    }
-    */
-
     #region Physics Method
     
     void Move()
@@ -177,7 +168,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
         
         moveSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed;
+        
         Vector3 move = Vector3.ClampMagnitude((transform.right * horizontalInput + transform.forward * verticalInput), 1f);
+        //Vector3 fixedMove = Vector3.Lerp(move, CharacterController.velocity, 5f);
+            
         CharacterController.Move(move * moveSpeed * Time.deltaTime);
     }
 

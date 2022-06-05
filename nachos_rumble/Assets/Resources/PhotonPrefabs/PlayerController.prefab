@@ -492,7 +492,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5613649920070620323
 Transform:
   m_ObjectHideFlags: 0
@@ -919,7 +919,7 @@ CharacterController:
   m_GameObject: {fileID: 1391451876877796243}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Height: 2
   m_Radius: 0.5
@@ -998,7 +998,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -4666,6 +4666,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8929192677043241333}
   - component: {fileID: 7951970103424558519}
+  - component: {fileID: 4953395260029836470}
   m_Layer: 7
   m_Name: WeaponCamera
   m_TagString: Camera
@@ -4730,7 +4731,7 @@ Camera:
   m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &8455875785125479487
+--- !u!114 &4953395260029836470
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5224,7 +5225,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7728233135177745310}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.468, z: 0.38}
+  m_LocalPosition: {x: 0, y: 0.45, z: 0.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 8929192677043241333}

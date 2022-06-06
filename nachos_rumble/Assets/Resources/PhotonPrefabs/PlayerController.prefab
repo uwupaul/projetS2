@@ -60,6 +60,7 @@ MonoBehaviour:
   shootingSound: {fileID: 3901891109511631298}
   reloadSound: {fileID: 6940699909943907651}
   animator: {fileID: 4890400943779184817}
+  forAnimation: {fileID: 49004509920377487}
 --- !u!114 &6963389620933787697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2091,6 +2092,7 @@ MonoBehaviour:
   shootingSound: {fileID: 5890192060035197247}
   reloadSound: {fileID: 3091679423342789519}
   animator: {fileID: 4473078262828153639}
+  forAnimation: {fileID: 1854495158336783112}
   scopeOverlay: {fileID: 422290376449418996}
   weaponCamera: {fileID: 6786888709146142100}
   mainCam: {fileID: 4507039563171314790}

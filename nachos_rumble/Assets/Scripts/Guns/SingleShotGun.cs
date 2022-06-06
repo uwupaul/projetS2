@@ -28,7 +28,7 @@ public class SingleShotGun : Gun
     public AudioSource shootingSound;
     public AudioSource reloadSound;
     public Animator animator;
-
+    public GameObject forAnimation;
 
     private void Start()
     {
@@ -107,6 +107,8 @@ public class SingleShotGun : Gun
         {
             if (!canShoot)
                 yield break;
+            
+            forAnimation.GetComponent<Animator>().Play("Shooting");
             
             bullet -= 1;
             ui_bullet.text = bullet + " / " + allBullet;

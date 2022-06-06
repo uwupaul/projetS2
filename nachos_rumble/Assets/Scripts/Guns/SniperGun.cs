@@ -14,6 +14,7 @@ public class SniperGun : Gun
     public AudioSource shootingSound;
     public AudioSource reloadSound;
     public Animator animator;
+    public GameObject forAnimation;
 
     public GameObject scopeOverlay;
     public GameObject weaponCamera;
@@ -141,6 +142,8 @@ public class SniperGun : Gun
         {
             if (!canShoot)
                 yield break;
+            
+            forAnimation.GetComponent<Animator>().Play("Shooting");
             
             bullet -= 1;
             ui_bullet.text = bullet + " / " + allBullet;

@@ -152,6 +152,9 @@ public class AutomaticGun : Gun
         bullet -= 1;
         ui_bullet.text = bullet + " / " + allBullet;
 
+        if (bullet != 0)
+            animator.SetBool("Shooting", true);
+        
         shootingSound.Play();
         AudioManager.Instance.SendSound(shootingSound, ((GunInfo) itemInfo).itemIndex);
 
@@ -166,9 +169,12 @@ public class AutomaticGun : Gun
             if (!hit.collider.gameObject.CompareTag("Player") && !hit.collider.gameObject.CompareTag("Camera"))
                 PV.RPC("RPC_Shoot", RpcTarget.All, hit.point, hit.normal);
         }
-
+        
+        
         var timeToWait = 1 / ((GunInfo) itemInfo).shotsPerSeconds;
         yield return new WaitForSecondsRealtime(timeToWait);
+        animator.SetBool("Shooting", false);
+        
         canShoot = true;
     }
 

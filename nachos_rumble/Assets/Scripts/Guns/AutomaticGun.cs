@@ -178,6 +178,8 @@ public class AutomaticGun : Gun
         Unscope();
         reloadSound.Play();
         
+        animator.SetBool("Reloading", true);
+        
         yield return new WaitForSeconds(reloadTime);
         
         if (!isEquiped)
@@ -199,6 +201,8 @@ public class AutomaticGun : Gun
         
         canShoot = true;
         isRealoading = false;
+        
+        animator.SetBool("Reloading", false);
     }
 
     Ray GetRayCast()

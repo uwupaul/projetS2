@@ -134,6 +134,8 @@ public class SingleShotGun : Gun
         {
             canShoot = false;
             reloadSound.Play();
+            
+            animator.SetBool("Reloading", true);
         
             yield return new WaitForSeconds(reloadTime);
 
@@ -156,6 +158,8 @@ public class SingleShotGun : Gun
         
             canShoot = true;
             isRealoading = false;
+            
+            animator.SetBool("Reloading", false);
         }
 
         Ray GetRayCast()

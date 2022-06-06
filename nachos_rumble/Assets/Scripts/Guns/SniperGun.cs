@@ -170,6 +170,8 @@ public class SniperGun : Gun
             Unscope();
             reloadSound.Play();
             
+            animator.SetBool("Reloading", true);
+            
             yield return new WaitForSeconds(reloadTime);
             
             if (!isEquiped)
@@ -191,6 +193,8 @@ public class SniperGun : Gun
             
             canShoot = true;
             isRealoading = false;
+            
+            animator.SetBool("Reloading", false);
         }
 
         Ray GetRayCast()

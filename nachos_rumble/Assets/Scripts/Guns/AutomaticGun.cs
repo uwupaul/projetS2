@@ -182,33 +182,17 @@ public class AutomaticGun : Gun
                     PV.RPC("RPC_Shoot", RpcTarget.All, hit.point, hit.normal);
             }
 
-        bullet -= 1;
-        ui_bullet.text = bullet + " / " + allBullet;
+            bullet -= 1;
+            ui_bullet.text = bullet + " / " + allBullet;
 
-        if (bullet != 0)
-            animator.SetBool("Shooting", true);
-        
-        shootingSound.Play();
-        AudioManager.Instance.SendSound(shootingSound, ((GunInfo) itemInfo).itemIndex);
-
-        canShoot = false;
-
-        Ray ray = GetRayCast();
-        ray.origin = cam.transform.position;
-        if (Physics.Raycast(ray, out RaycastHit hit))
-        {
-            hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo) itemInfo).damage,
-                PV.Owner, ((GunInfo) itemInfo).itemIndex);
-            if (!hit.collider.gameObject.CompareTag("Player") && !hit.collider.gameObject.CompareTag("Camera"))
-                PV.RPC("RPC_Shoot", RpcTarget.All, hit.point, hit.normal);
-        }
-        
-        
-        var timeToWait = 1 / ((GunInfo) itemInfo).shotsPerSeconds;
-        yield return new WaitForSecondsRealtime(timeToWait);
-        animator.SetBool("Shooting", false);
-        
-        canShoot = true;
+            if (bullet != 0)
+                animator.SetBool("Shooting", true);
+            
+            var timeToWait = 1 / ((GunInfo) itemInfo).shotsPerSeconds;
+            yield return new WaitForSecondsRealtime(timeToWait);
+            animator.SetBool("Shooting", false);
+            
+            canShoot = true;
     }
 
     IEnumerator Reload()

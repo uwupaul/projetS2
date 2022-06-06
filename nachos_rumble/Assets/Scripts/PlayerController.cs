@@ -62,8 +62,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         private TextMeshProUGUI ui_username;
         private TextMeshProUGUI ui_kills;
         private TextMeshProUGUI ui_death;
-        
-        public TextMeshPro playerUsername;
 
         public AudioSource deathAudio;
 
@@ -101,9 +99,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 HealthBar.SetMaxHealth(MaxHealth);
                 textHealth.text = MaxHealth.ToString();
                 textHealth.color = Color.white;
-                ui_username.text = PV.Owner.NickName;
-                playerUsername.text = PV.Owner.NickName; // ici ?
-                playerUsername.gameObject.SetActive(false);
+                ui_username.text = PhotonNetwork.LocalPlayer.NickName;
             #endregion
             
             CharacterController.detectCollisions = false;
@@ -162,6 +158,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             if(Input.GetKeyDown(KeyCode.F8))
                     Die();
 
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                items[itemIndex].Unequip();
+                Animator.Play("Twerk");
+            }
+            
         #endregion
         
         if (!EscapeMod)

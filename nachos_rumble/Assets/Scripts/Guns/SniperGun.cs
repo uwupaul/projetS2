@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Photon.Pun;
+using TMPro;
 using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
@@ -19,8 +20,20 @@ public class SniperGun : Gun
     
     public float AdsFOV;
     public float HipFOV;
+    
+    #region reload system variable
+    
+        public float reloadTime;
+        public int allBullet;
+        public int bullet;
+        private int initBullet;
+        private bool isRealoading = false;
+        private TextMeshProUGUI ui_bullet;
+        
+    #endregion
 
     #region UI gameObjects
+    
         private GameObject textHealth;
         private GameObject ui_username;
         private GameObject ui_kills;
@@ -28,6 +41,7 @@ public class SniperGun : Gun
         private GameObject HealthBar;
         private GameObject crossHair;
         public GameObject sniperICon;
+        
     #endregion
     
     private void Awake()
@@ -40,12 +54,17 @@ public class SniperGun : Gun
         if (!PV.IsMine)
             return;
         
+        initBullet = bullet;
+        
         ui_username = GameObject.Find("Canvas/BottomLeft/UsernameText");
         ui_kills = GameObject.Find("Canvas/TopLeft/KillsText");
         ui_death = GameObject.Find("Canvas/TopLeft/DeathText");
         textHealth = GameObject.Find("Canvas/BottomLeft/TextHealth");
         HealthBar = GameObject.Find("Canvas/BottomLeft/HealthBar");
         crossHair = GameObject.Find("Canvas/Crosshair");
+        
+        
+        ui_bullet = GameObject.Find("Canvas/NumberOfBullet").GetComponent<TextMeshProUGUI>();
         
         /*
         HealthBar.SetActive(true);
@@ -61,9 +80,32 @@ public class SniperGun : Gun
     {
         if (!PV.IsMine || !isEquiped)
             return;
+        
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (!isRealoading && allBullet != 0 && bullet != initBullet)
+            {
+                isRealoading = true;
+                StartCoroutine(Reload());
+            }
+        }
 
+        if (isRealoading) return;
+        
         if (Input.GetMouseButtonDown(0))
-            StartCoroutine(Shoot());
+        {
+            if (bullet <= 0)
+            {
+                Debug.Log("is reload : " + isRealoading);
+                if (isRealoading == false && allBullet != 0)
+                {
+                    isRealoading = true;
+                    StartCoroutine(Reload());
+                }
+            }
+            else
+                StartCoroutine(Shoot());
+        }
 
         if (Input.GetMouseButtonDown(1))
             ToggleScope();
@@ -74,6 +116,8 @@ public class SniperGun : Gun
         isEquiped = true;
         itemGameObject.SetActive(true);
         canShoot = true;
+        
+        ui_bullet.text = bullet + " / " + allBullet;
         
         if(PV.IsMine)
         {
@@ -96,6 +140,9 @@ public class SniperGun : Gun
         {
             if (!canShoot)
                 yield break;
+            
+            bullet -= 1;
+            ui_bullet.text = bullet + " / " + allBullet;
 
             shootingSound.Play();
             AudioManager.Instance.SendSound(shootingSound, ((GunInfo) itemInfo).itemIndex);
@@ -114,6 +161,33 @@ public class SniperGun : Gun
             var timeToWait = 1 / ((GunInfo) itemInfo).shotsPerSeconds;
             yield return new WaitForSecondsRealtime(timeToWait);
             canShoot = true;
+        }
+        
+        IEnumerator Reload()
+        {
+            canShoot = false;
+            Unscope();
+            yield return new WaitForSeconds(reloadTime);
+            
+            if (!isEquiped)
+            {
+                canShoot = true;
+                isRealoading = false;
+                yield break;
+            }
+            
+            int b = initBullet - bullet;
+            if (allBullet - b < 0)
+            {
+                b = allBullet;
+            }
+            allBullet -= b;
+            bullet += b;
+        
+            ui_bullet.text = bullet + " / " + allBullet;
+            
+            canShoot = true;
+            isRealoading = false;
         }
 
         Ray GetRayCast()

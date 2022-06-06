@@ -53,6 +53,9 @@ MonoBehaviour:
   bulletImpactPrefab: {fileID: 100002, guid: 2f9348d6583cde14eb0d82bb9732647e, type: 3}
   isScoped: 0
   cam: {fileID: 4507039563171314790}
+  reloadTime: 2
+  allBullet: 24
+  bullet: 6
   shootingSound: {fileID: 3901891109511631298}
   animator: {fileID: 4890400943779184817}
 --- !u!114 &6963389620933787697
@@ -1993,6 +1996,9 @@ MonoBehaviour:
   mainCam: {fileID: 4507039563171314790}
   AdsFOV: 20
   HipFOV: 70
+  reloadTime: 3.5
+  allBullet: 12
+  bullet: 3
   sniperICon: {fileID: 5424548249386054853}
 --- !u!1 &2004191918806618975
 GameObject:
@@ -4618,6 +4624,9 @@ MonoBehaviour:
   bulletImpactPrefab: {fileID: 100002, guid: 2f9348d6583cde14eb0d82bb9732647e, type: 3}
   isScoped: 0
   cam: {fileID: 4507039563171314790}
+  reloadTime: 2
+  allBullet: 80
+  bullet: 20
   shootingSound: {fileID: 7228900176841899195}
   animator: {fileID: 8220516866803225750}
   AdsFOV: 55
@@ -4744,7 +4753,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8929192677043241333}
   - component: {fileID: 7951970103424558519}
-  - component: {fileID: 4953395260029836470}
   m_Layer: 7
   m_Name: WeaponCamera
   m_TagString: Camera
@@ -4809,66 +4817,6 @@ Camera:
   m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &4953395260029836470
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6786888709146142100}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 948f4100a11a5c24981795d21301da5c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  volumeTrigger: {fileID: 8929192677043241333}
-  volumeLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  stopNaNPropagation: 1
-  finalBlitToCameraTarget: 0
-  antialiasingMode: 3
-  temporalAntialiasing:
-    jitterSpread: 0.75
-    sharpness: 0.25
-    stationaryBlending: 0.95
-    motionBlending: 0.85
-  subpixelMorphologicalAntialiasing:
-    quality: 2
-  fastApproximateAntialiasing:
-    fastMode: 0
-    keepAlpha: 0
-  fog:
-    enabled: 1
-    excludeSkybox: 1
-  debugLayer:
-    lightMeter:
-      width: 512
-      height: 256
-      showCurves: 1
-    histogram:
-      width: 512
-      height: 256
-      channel: 3
-    waveform:
-      exposure: 0.12
-      height: 256
-    vectorscope:
-      size: 256
-      exposure: 0.12
-    overlaySettings:
-      linearDepth: 0
-      motionColorIntensity: 4
-      motionGridSize: 64
-      colorBlindnessType: 0
-      colorBlindnessStrength: 1
-  m_Resources: {fileID: 11400000, guid: d82512f9c8e5d4a4d938b575d47f88d4, type: 2}
-  m_ShowToolkit: 0
-  m_ShowCustomSorter: 0
-  breakBeforeColorGrading: 0
-  m_BeforeTransparentBundles: []
-  m_BeforeStackBundles: []
-  m_AfterStackBundles: []
 --- !u!1 &7023497736415276237
 GameObject:
   m_ObjectHideFlags: 0

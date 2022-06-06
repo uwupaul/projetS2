@@ -14,20 +14,27 @@ public class AutomaticGun : Gun
     private PhotonView PV;
     private bool canShoot;
 
-    public int initBullet = 30;
-    public int bullet = 30;
+    #region reload system variable
+
+        public float reloadTime;
+        public int allBullet;
+        public int bullet;
+        private int initBullet;
+        private bool isRealoading = false;
+        private TextMeshProUGUI ui_bullet;
+
+    #endregion
+    
     
     public AudioSource shootingSound;
     public Animator animator;
     
     private GameObject crossHair;
-    private TextMeshProUGUI ui_bullet;
+    
 
     public float AdsFOV;
     public float HipFOV;
-
-    private bool isRealoading = false;
-
+    
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
@@ -37,11 +44,11 @@ public class AutomaticGun : Gun
     {
         if (!PV.IsMine)
             return;
+
+        initBullet = bullet;
         
         crossHair = GameObject.Find("Canvas/Crosshair");
         ui_bullet = GameObject.Find("Canvas/NumberOfBullet").GetComponent<TextMeshProUGUI>();
-        
-        ui_bullet.text = bullet + " / " + initBullet;
     }
     
     private void Update()
@@ -49,16 +56,27 @@ public class AutomaticGun : Gun
         if (!PV.IsMine || !isEquiped)
             return;
 
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (!isRealoading && allBullet != 0 && bullet != initBullet)
+            {
+                isRealoading = true;
+                StartCoroutine(Reload());
+            }
+        }
+
+        if (isRealoading)
+            return;
+
         if (Input.GetMouseButton(0))
         {
             if (bullet <= 0)
             {
-                if (isRealoading == false)
+                if (isRealoading == false && allBullet != 0)
                 {
+                    isRealoading = true;
                     StartCoroutine(Reload());
-                    isRealoading = false;
                 }
-                    
             }
             else
                 StartCoroutine(Shoot());
@@ -74,6 +92,8 @@ public class AutomaticGun : Gun
         itemGameObject.SetActive(true);
         canShoot = true;
         
+        ui_bullet.text = bullet + " / " + allBullet;
+        
         if (PV.IsMine)
         {
             Hashtable hash = new Hashtable();
@@ -85,9 +105,11 @@ public class AutomaticGun : Gun
 
     public override void Unequip()
     {
+        StopCoroutine(Reload());
+        
         isEquiped = false;
         itemGameObject.SetActive(false);
-        
+
         cam.fieldOfView = HipFOV;
         Unscope();
     }
@@ -127,8 +149,7 @@ public class AutomaticGun : Gun
             yield break;
 
         bullet -= 1;
-        Debug.Log("nombre de balles : " + bullet);
-        ui_bullet.text = bullet + " / " + initBullet;
+        ui_bullet.text = bullet + " / " + allBullet;
 
         shootingSound.Play();
         AudioManager.Instance.SendSound(shootingSound, ((GunInfo) itemInfo).itemIndex);
@@ -152,11 +173,30 @@ public class AutomaticGun : Gun
 
     IEnumerator Reload()
     {
-        isRealoading = true;
-        yield return new WaitForSeconds(2f);
-        bullet = initBullet;
-        Debug.Log("mtn");
-        ui_bullet.text = bullet + " / " + initBullet;
+        canShoot = false;
+        Unscope();
+        
+        yield return new WaitForSeconds(reloadTime);
+        
+        if (!isEquiped)
+        {
+            canShoot = true;
+            isRealoading = false;
+            yield break;
+        }
+        
+        int b = initBullet - bullet;
+        if (allBullet - b < 0)
+        {
+            b = allBullet;
+        }
+        allBullet -= b;
+        bullet += b;
+
+        ui_bullet.text = bullet + " / " + allBullet;
+        
+        canShoot = true;
+        isRealoading = false;
     }
 
     Ray GetRayCast()

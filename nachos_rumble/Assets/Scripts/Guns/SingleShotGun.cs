@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
+using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
@@ -12,11 +13,30 @@ public class SingleShotGun : Gun
 
     private PhotonView PV;
     private bool canShoot;
+    
+    #region reload system variable
+
+        public float reloadTime;
+        public int allBullet;
+        public int bullet;
+        private int initBullet;
+        private bool isRealoading = false;
+        private TextMeshProUGUI ui_bullet;
+
+    #endregion
 
     public AudioSource shootingSound;
     public Animator animator;
 
-    
+
+    private void Start()
+    {
+        initBullet = bullet;
+        
+        Debug.Log("start deagle");
+        
+        ui_bullet = GameObject.Find("Canvas/NumberOfBullet").GetComponent<TextMeshProUGUI>();
+    }
 
     private void Awake()
     {
@@ -27,16 +47,44 @@ public class SingleShotGun : Gun
     {
         if (!PV.IsMine || !isEquiped)
             return;
+        
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (!isRealoading && allBullet != 0 && bullet != initBullet)
+            {
+                isRealoading = true;
+                StartCoroutine(Reload());
+            }
+        }
+
+        if (isRealoading)
+            return;
 
         if (Input.GetMouseButtonDown(0))
-            StartCoroutine(Shoot());
+        {
+            if (bullet <= 0)
+            {
+                if (isRealoading == false && allBullet != 0)
+                {
+                    isRealoading = true;
+                    StartCoroutine(Reload());
+                }
+            }
+            else
+                StartCoroutine(Shoot());
+        }
     }
 
     public override void Equip()
     {
+        ui_bullet = GameObject.Find("Canvas/NumberOfBullet").GetComponent<TextMeshProUGUI>();
+        
         isEquiped = true;
         itemGameObject.SetActive(true);
         canShoot = true;
+        
+        Debug.Log("équipe deagle");
+        ui_bullet.text = bullet + " / " + allBullet;
         
         if (PV.IsMine)
         {
@@ -58,6 +106,9 @@ public class SingleShotGun : Gun
         {
             if (!canShoot)
                 yield break;
+            
+            bullet -= 1;
+            ui_bullet.text = bullet + " / " + allBullet;
 
             shootingSound.Play();
             AudioManager.Instance.SendSound(shootingSound, ((GunInfo) itemInfo).itemIndex);
@@ -76,6 +127,33 @@ public class SingleShotGun : Gun
             var timeToWait = 1 / ((GunInfo) itemInfo).shotsPerSeconds;
             yield return new WaitForSecondsRealtime(timeToWait);
             canShoot = true;
+        }
+        
+        IEnumerator Reload()
+        {
+            canShoot = false;
+        
+            yield return new WaitForSeconds(reloadTime);
+
+            if (!isEquiped)
+            {
+                canShoot = true;
+                isRealoading = false;
+                yield break;
+            }
+
+            int b = initBullet - bullet;
+            if (allBullet - b < 0)
+            {
+                b = allBullet;
+            }
+            allBullet -= b;
+            bullet += b;
+        
+            ui_bullet.text = bullet + " / " + allBullet;
+        
+            canShoot = true;
+            isRealoading = false;
         }
 
         Ray GetRayCast()

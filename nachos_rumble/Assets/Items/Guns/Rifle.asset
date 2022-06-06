@@ -17,3 +17,8 @@ MonoBehaviour:
   damage: 30
   shotSpread: 9
   shotsPerSeconds: 9
+  scopeSensMultiplier: 0.5
+  noscopePrecisionMultiplier: 0.5
+  movementPrecisionMultiplier: 0.6
+  adsFOV: 50
+  hipFOV: 70

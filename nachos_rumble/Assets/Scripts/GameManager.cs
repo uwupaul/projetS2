@@ -7,7 +7,7 @@ using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
-using UnityEngine.SceneManagement;
+
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -38,10 +38,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        Debug.Log($"PV of GameManager is :{PV.Owner is null}");
-
         QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = 120;
+        Application.targetFrameRate = 60;
         
         Hashtable H1 = new Hashtable();
         Hashtable H2 = new Hashtable();
@@ -55,14 +53,17 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
     {
-        if (!PV.IsMine || gameEnded)
+        if (!PhotonNetwork.LocalPlayer.IsMasterClient) //|| (bool)PhotonNetwork.CurrentRoom.CustomProperties["ENDED"])
             return;
         
         if (changedProps.ContainsKey("K"))
         {
             if ((int) changedProps["K"] >= scoreToWin)
             {
-                gameEnded = true;
+                var H = new Hashtable();
+                H.Add("ENDED", true);
+                PhotonNetwork.CurrentRoom.SetCustomProperties(H);
+                
                 GameWinner = targetPlayer;
                 PV.RPC("RPC_EndGame", RpcTarget.All, GameWinner);
             }
@@ -71,7 +72,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        if (gameEnded && PV.Owner.IsMasterClient)
+        if ((bool)PhotonNetwork.CurrentRoom.CustomProperties["ENDED"] && PhotonNetwork.LocalPlayer.IsMasterClient)
             PhotonNetwork.CloseConnection(newPlayer); // pour le kick
         
         // En théorie ca serait mieux de créer une properties de Room 'gameEnded', et si elle est True, la room disparait
@@ -81,6 +82,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     [PunRPC]
     void RPC_EndGame(Player winner)
     {
+        gameEnded = true;
         StartCoroutine(EndGame(winner)); 
     }
     

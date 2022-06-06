@@ -36,8 +36,6 @@ public class PlayScoreScript : MonoBehaviourPunCallbacks
         {
             transform.Find("Death").GetComponent<Text>().text = Convert.ToString((int)changedProps["Death"]);
         }
-
-
     }
     
     public override void OnPlayerLeftRoom(Player otherPlayer)

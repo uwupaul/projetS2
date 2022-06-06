@@ -45,10 +45,4 @@ public class RoomManager : MonoBehaviourPunCallbacks
             //InstantiateAI(); // fait spawn une IA (par personne?)
         }
     }
-
-    void InstantiateAI()
-    {
-        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "AIManager"), Vector3.zero,
-            Quaternion.identity);
-    }
 }

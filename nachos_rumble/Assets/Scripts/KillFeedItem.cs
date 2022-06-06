@@ -36,6 +36,24 @@ public class KillFeedItem : MonoBehaviour
             weaponIcons[gunIndex].SetActive(true);
         }
     }
+    
+    public void SetUp(string victimName, string murdererName, int gunIndex)
+    {
+        victimText.text = victimName;
+        murdererText.text = murdererName is null ? "" : murdererName;
+        _gunIndex = gunIndex;
+        
+        if (gunIndex == -1)
+        {
+            // mettre l'icon de chute
+            weaponIcons[weaponIcons.Length-1].SetActive(true);
+            ShortBackground.SetActive(true);
+        }
+        else {
+            LongBackground.SetActive(true);
+            weaponIcons[gunIndex].SetActive(true);
+        }
+    }
 
     public void FadeOutDestroy() =>
         StartCoroutine(ItemDestroyCoroutine());

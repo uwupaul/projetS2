@@ -19,6 +19,8 @@ public abstract class Item : MonoBehaviour
     {
         // Pour changer un objet de layer. Sert à tout les items pour ne pas clip dans les murs.
         
+        // Faire que les armes restent dans la caméra principale mais soit render en ShadowsOnly
+        
         foreach (Transform child in trans)
         {
             child.gameObject.layer = LayerMask.NameToLayer(name);

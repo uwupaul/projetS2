@@ -7,6 +7,7 @@ using Photon.Realtime;
 using TMPro;
 using Random = UnityEngine.Random;
 using UnityEngine.UI;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
@@ -14,6 +15,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] Text globalKillsField;
     [SerializeField] Text globalDeathsField;
     [SerializeField] Text KDField;
+    [SerializeField] TextMeshProUGUI AINumber;
     
     public static Launcher launcher;
 
@@ -26,9 +28,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] GameObject playerListItemPrefab;
     [SerializeField] GameObject startGameButton;
     [SerializeField] GameObject NoUsernamePopup;
-    
-    // Faire que quand on clique sur FindRoom ou CreateRoom : 
-    // si on a set de username, alors on a un petit pop up qui apparaît pour nous le dire, avec un bouton OK qui ferme tout
+    [SerializeField] GameObject AIManagement;
 
     void Start()
     {
@@ -122,11 +122,22 @@ public class Launcher : MonoBehaviourPunCallbacks
         }
         
         startGameButton.SetActive(PhotonNetwork.IsMasterClient); // set le bouton startGame à l'host
+        AIManagement.SetActive(PhotonNetwork.IsMasterClient);
+
+        if (PhotonNetwork.IsMasterClient) {
+            Hashtable h = new Hashtable {{"AI", 0}};
+            PhotonNetwork.CurrentRoom.SetCustomProperties(h);
+            
+            // Pour créer la properties au cas ou on ne veut pas d'IA dans la room
+        }
     }
 
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
         startGameButton.SetActive(PhotonNetwork.IsMasterClient);
+        AIManagement.SetActive(PhotonNetwork.IsMasterClient);
+        
+        SetAINumberText((int)PhotonNetwork.CurrentRoom.CustomProperties["AI"]);
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message)
@@ -179,4 +190,36 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         Application.Quit();
     }
+
+    #region AI Management
+
+        public void SetAINumberText(int n)
+        {
+            AINumber.text = n.ToString();
+        }
+        public void IncreaseAICount()
+        {
+            int n = Convert.ToInt32(PhotonNetwork.CurrentRoom.CustomProperties["AI"]);
+            
+            if (n >= 4)
+                return;
+            
+            SetAINumberText(n+1);
+            Hashtable h = new Hashtable {{"AI", n + 1}};
+            PhotonNetwork.CurrentRoom.SetCustomProperties(h);
+        }
+        
+        public void DecreaseAICount()
+        {
+            int n = Convert.ToInt32(PhotonNetwork.CurrentRoom.CustomProperties["AI"]);
+            
+            if (n <= 0)
+                return;
+            
+            SetAINumberText(n-1);
+            Hashtable h = new Hashtable {{"AI", n - 1}};
+            PhotonNetwork.CurrentRoom.SetCustomProperties(h);
+        }
+
+    #endregion
 }

@@ -12,13 +12,11 @@ public class SniperGun : Gun
 
     public AudioSource shootingSound;
     public Animator animator;
+    public PlayerController PC;
 
     public GameObject scopeOverlay;
     public GameObject weaponCamera;
     public Camera mainCam;
-    
-    public float AdsFOV;
-    public float HipFOV;
 
     #region UI gameObjects
         private GameObject textHealth;
@@ -33,6 +31,9 @@ public class SniperGun : Gun
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
+        shootingSound.spatialBlend = 1f;
+        shootingSound.spread = 0;
+        shootingSound.spatialize = true;
     }
 
     private void Start()
@@ -46,15 +47,6 @@ public class SniperGun : Gun
         textHealth = GameObject.Find("Canvas/BottomLeft/TextHealth");
         HealthBar = GameObject.Find("Canvas/BottomLeft/HealthBar");
         crossHair = GameObject.Find("Canvas/Crosshair");
-        
-        /*
-        HealthBar.SetActive(true);
-        ui_username.SetActive(true);
-        ui_kills.SetActive(true);
-        ui_death.SetActive(true);
-        textHealth.SetActive(true);
-        crossHair.SetActive(true);
-        */
     }
     
     private void Update()
@@ -92,13 +84,21 @@ public class SniperGun : Gun
     }
 
     #region ShootMethods
+    
+        [PunRPC]
+        void RPC_RemoteShoot()
+        {
+            shootingSound.Play();
+        }
+        
         IEnumerator Shoot()
         {
             if (!canShoot)
                 yield break;
-
+            
+            PV.RPC("RPC_RemoteShoot", RpcTarget.Others);
             shootingSound.Play();
-            AudioManager.Instance.SendSound(shootingSound, ((GunInfo) itemInfo).itemIndex);
+            //AudioManager.Instance.SendSound(shootingSound, ((GunInfo) itemInfo).itemIndex);
             
             canShoot = false;
             
@@ -118,7 +118,9 @@ public class SniperGun : Gun
 
         Ray GetRayCast()
         {
-            float s = ((GunInfo) itemInfo).shotSpread / 1000;
+            float m = ComputePrecisionMultiplier(PC.Speed);
+            float s = ((GunInfo) itemInfo).shotSpread / 1000 / m;
+            Debug.Log($"m vaut {m}");
             Ray ray = mainCam.ViewportPointToRay(new Vector3(Random.Range(0.5f - s, 0.5f + s), Random.Range(0.5f - s, 0.5f + s)));
             return ray;
         }
@@ -164,11 +166,14 @@ public class SniperGun : Gun
         crossHair.SetActive(true);
         sniperICon.SetActive(true);
         
-        mainCam.fieldOfView = HipFOV;
+        mainCam.fieldOfView = ((GunInfo) itemInfo).hipFOV;;
+        
+        PC.sensMultiplier = 1;
     }
 
     IEnumerator ScopeCoroutine()
     {
+        PC.sensMultiplier = ((GunInfo)itemInfo).scopeSensMultiplier;
         animator.SetBool("Scoped", true);
         
         yield return new WaitForSeconds(.18f);
@@ -184,7 +189,7 @@ public class SniperGun : Gun
         crossHair.SetActive(false);
         sniperICon.SetActive(false);
         
-        mainCam.fieldOfView = AdsFOV;
+        mainCam.fieldOfView = ((GunInfo) itemInfo).adsFOV;;
     }
     #endregion
 }

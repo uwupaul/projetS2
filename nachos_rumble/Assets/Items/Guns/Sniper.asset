@@ -15,5 +15,10 @@ MonoBehaviour:
   itemName: Rifle
   itemIndex: 2
   damage: 100
-  shotSpread: 2
+  shotSpread: 3
   shotsPerSeconds: 0.5
+  scopeSensMultiplier: 0.25
+  noscopePrecisionMultiplier: 0.1
+  movementPrecisionMultiplier: 0.2
+  adsFOV: 20
+  hipFOV: 70

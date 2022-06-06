@@ -48,6 +48,10 @@ MonoBehaviour:
   - RPC_SyncWeapon
   - RPC_KillFeedEntry
   - RPC_PlaySound
+  - RPC_ShootSound
+  - RPC_RemoteShoot
+  - RPC_KillFeedEntryName
+  - RPC_TakeDamageName
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

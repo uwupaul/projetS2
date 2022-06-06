@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,34 +7,32 @@ using System.IO;
 
 public class AIManager : MonoBehaviour
 {
-    PhotonView PV;
-    GameObject controller;
-
+    private PhotonView PV;
     private void Awake()
     {
-        PV = GetComponent<PhotonView>(); // pour identifier l'IA
-    }
-    
-    void Start()
-    {
-        if (PV.IsMine)
-            CreateController();
+        PV = GetComponent<PhotonView>();
     }
 
-    void CreateController()
+    private void Start()
+    {
+        if (!PhotonNetwork.LocalPlayer.IsMasterClient)
+            return;
+        
+        int n = (int)PhotonNetwork.CurrentRoom.CustomProperties["AI"];
+        
+        for (int i = 0; i < n; i++)
+            SpawnAI();
+    }
+
+    public void SpawnAI()
     {
         Transform spawnpoint = SpawnManager.Instance.GetSpawnPoint();
-        controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs","AIController"),spawnpoint.position,spawnpoint.rotation, 0, new object[] { PV.ViewID });
-        Debug.Log("AIManager : CreateController()");
-        
-        //On va instantier le prefab 'AIController' qui se trouve dans le dossier 'PhotonPrefabs' à la position
-        //et à la même rotation qu'un SpawnPoint choisi aléatoirement par 'GetSpawnPoint'
+        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs","AIController"),spawnpoint.position,spawnpoint.rotation, 0, new object[] { PV.ViewID });
     }
 
-    public void Die()
+    public void Die(AIController ai)
     {
-        PhotonNetwork.Destroy(controller);
-        CreateController();
-        Debug.Log("AIManager : Die()");
+        PhotonNetwork.Destroy(ai.gameObject);
+        SpawnAI();
     }
 }

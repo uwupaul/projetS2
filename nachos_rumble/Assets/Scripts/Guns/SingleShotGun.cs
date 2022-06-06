@@ -14,13 +14,14 @@ public class SingleShotGun : Gun
     private bool canShoot;
 
     public AudioSource shootingSound;
-    public Animator animator;
-
-    
+    public PlayerController PC;
 
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
+        shootingSound.spatialBlend = 1f;
+        shootingSound.spread = 0;
+        shootingSound.spatialize = true;
     }
 
     private void Update()
@@ -54,13 +55,20 @@ public class SingleShotGun : Gun
     }
 
     #region ShootMethods
+        [PunRPC]
+        void RPC_RemoteShoot()
+        {
+            shootingSound.Play();
+        }
+        
         IEnumerator Shoot()
         {
             if (!canShoot)
                 yield break;
 
+            PV.RPC("RPC_RemoteShoot", RpcTarget.Others);
             shootingSound.Play();
-            AudioManager.Instance.SendSound(shootingSound, ((GunInfo) itemInfo).itemIndex);
+            //AudioManager.Instance.SendSound(shootingSound, ((GunInfo) itemInfo).itemIndex);
             
             canShoot = false;
             
@@ -80,7 +88,9 @@ public class SingleShotGun : Gun
 
         Ray GetRayCast()
         {
-            float s = ((GunInfo) itemInfo).shotSpread / 1000;
+            float m = ComputePrecisionMultiplier(PC.Speed);
+            float s = ((GunInfo) itemInfo).shotSpread / 1000 / m;
+            Debug.Log($"m vaut {m}");
             Ray ray = cam.ViewportPointToRay(new Vector3(Random.Range(0.5f - s, 0.5f + s), Random.Range(0.5f - s, 0.5f + s)));
             return ray;
         }

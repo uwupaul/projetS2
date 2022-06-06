@@ -47,8 +47,8 @@ public class SettingsMenu : MonoBehaviourPunCallbacks
     {
         for (int i = 0; i < resolutions.Length; i++) 
         {
-            if (resolutions[i].Item1 == Screen.currentResolution.width &&
-                resolutions[i].Item2 == Screen.currentResolution.height)
+            if (resolutions[i].Item1 == Screen.width &&
+                resolutions[i].Item2 == Screen.height)
             {
                 return i;
             }

@@ -13,16 +13,22 @@ public class AutomaticGun : Gun
     private PhotonView PV;
     private bool canShoot;
 
+    public float pitchChange;
+
     public AudioSource shootingSound;
     public Animator animator;
     private GameObject crossHair;
 
-    public float AdsFOV;
-    public float HipFOV;
+    public AudioClip[] clips;
+    
+    public PlayerController PC;
 
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
+        shootingSound.spatialBlend = 1f;
+        shootingSound.spread = 0;
+        shootingSound.spatialize = true;
     }
 
     private void Start()
@@ -64,8 +70,8 @@ public class AutomaticGun : Gun
     {
         isEquiped = false;
         itemGameObject.SetActive(false);
-        
-        cam.fieldOfView = HipFOV;
+
+        cam.fieldOfView = ((GunInfo) itemInfo).hipFOV;
         Unscope();
     }
 
@@ -84,26 +90,40 @@ public class AutomaticGun : Gun
         {
             animator.SetBool("Scoped", false);
             crossHair.SetActive(true);
-            cam.fieldOfView = HipFOV;
+            cam.fieldOfView = ((GunInfo) itemInfo).hipFOV;;
+            PC.sensMultiplier = 1;
         }
 
         IEnumerator ScopeCoroutine()
         {
+            PC.sensMultiplier = ((GunInfo) itemInfo).scopeSensMultiplier;;
             animator.SetBool("Scoped", isScoped);
             yield return new WaitForSeconds(.18f);
             crossHair.SetActive(false);
-            cam.fieldOfView = AdsFOV; // mettre une animation pour que ca soit plus fluide?
+            cam.fieldOfView = ((GunInfo) itemInfo).adsFOV;; // mettre une animation pour que ca soit plus fluide?
         }
     #endregion
     
     #region ShootMethods
+
+        [PunRPC]
+        void RPC_RemoteShoot(float pitch, int clipIndex)
+        {
+            shootingSound.pitch = pitch;
+            shootingSound.PlayOneShot(clips[clipIndex]);
+        }
+    
         IEnumerator Shoot()
         {
             if (!canShoot)
                 yield break;
 
-            shootingSound.Play();
-            AudioManager.Instance.SendSound(shootingSound, ((GunInfo) itemInfo).itemIndex);
+            shootingSound.pitch = Random.Range(1 - pitchChange, 1 + pitchChange);
+            int clipIndex = Random.Range(0, 1);
+            shootingSound.PlayOneShot(clips[clipIndex]);
+            PV.RPC("RPC_RemoteShoot", RpcTarget.Others, shootingSound.pitch, clipIndex);
+            
+            //AudioManager.Instance.SendSound(shootingSound, ((GunInfo) itemInfo).itemIndex);
             
             canShoot = false;
             
@@ -123,7 +143,9 @@ public class AutomaticGun : Gun
 
         Ray GetRayCast()
         {
-            float s = ((GunInfo) itemInfo).shotSpread / 1000;
+            float m = ComputePrecisionMultiplier(PC.Speed);
+            float s = ((GunInfo) itemInfo).shotSpread / 1000 / m;
+            Debug.Log($"m vaut {m}");
             Ray ray = cam.ViewportPointToRay(new Vector3(Random.Range(0.5f - s, 0.5f + s), Random.Range(0.5f - s, 0.5f + s)));
             return ray;
         }

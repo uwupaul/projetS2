@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: Pistol
   m_EditorClassIdentifier: 
   itemName: Pistol
+  itemIndex: 0
   damage: 34
   shotSpread: 5
   shotsPerSeconds: 3
-  isAutomatic: 0
-  canScope: 0
-  canScopeOthers: 0
+  scopeSensMultiplier: 1
+  noscopePrecisionMultiplier: 1
+  movementPrecisionMultiplier: 0.5
+  adsFOV: 70
+  hipFOV: 70

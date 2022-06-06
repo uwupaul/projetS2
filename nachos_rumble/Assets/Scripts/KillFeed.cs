@@ -47,7 +47,25 @@ public class KillFeed : MonoBehaviourPunCallbacks
         PV.RPC("RPC_KillFeedEntry", RpcTarget.All, victim, murderer, gunIndex);
     }
 
+    public void KillFeedEntry(string victimName, string murdererName, int gunIndex)
+    {
+        PV.RPC("RPC_KillFeedEntryName", RpcTarget.All, victimName, murdererName, gunIndex);
+    }
 
+    [PunRPC]
+    void RPC_KillFeedEntryName(string victimName, string murdererName, int gunIndex)
+    {
+        Debug.Log("KillFeedItem : RPC_KillFeedEntry");
+        
+        GameObject go = Instantiate(killFeedPrefab, transform);
+        go.SetActive(false);
+        go.GetComponent<KillFeedItem>().SetUp(victimName, murdererName, gunIndex);
+        ItemsQueue.Enqueue(go);
+        
+        ManageQueue();
+    }
+
+    
     [PunRPC]
     void RPC_KillFeedEntry(Player victim, Player murderer, int gunIndex)
     {

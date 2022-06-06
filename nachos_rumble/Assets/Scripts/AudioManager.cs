@@ -45,12 +45,12 @@ public class AudioManager : MonoBehaviourPunCallbacks
     [PunRPC]
     void RPC_PlaySound(int soundIndex, float minDistance, float maxDistance, Vector3 position)
     {
-        AudioSource.clip = clips[soundIndex];
-        
+        //AudioSource.clip = clips[soundIndex];
         AudioSource.minDistance = minDistance;
         AudioSource.maxDistance = maxDistance;
         AudioSource.gameObject.transform.position = position;
-        AudioSource.Play();
+        //AudioSource.Play();
+        AudioSource.PlayOneShot(clips[soundIndex]);
         Debug.Log("sound played" + position);
     }
 }

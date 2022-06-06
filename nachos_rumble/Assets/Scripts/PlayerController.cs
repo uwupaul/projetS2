@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         public Item[] items;
         int itemIndex;
         int previousItemIndex = -1;
+
+        public float sensMultiplier;
     #endregion
         
     #region Physics
@@ -34,7 +36,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         public LayerMask groundMask;
         
         public float jumpHeight;
-        public float airMultiplyer;
+        public float airMultiplier;
         
         public float fallSpeedThreshold;
         
@@ -45,6 +47,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         private float xRotation;
 
         public CharacterController CharacterController;
+        public float Speed;
     #endregion
     
     #region Health
@@ -71,12 +74,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         bool EscapeMod => UIM.EscapeMod;
         float mouseSensitivity => UIM.settingsMenu.mouseSensitivity;
     #endregion
+
+    private Animator Animator;
     
     void Awake()
     {
         PV = GetComponent<PhotonView>();
         playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
         UIM = playerManager.GetComponentInChildren<UIManager>();
+        Animator = GetComponent<Animator>();
     }
 
     void Start()
@@ -96,13 +102,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 textHealth.text = MaxHealth.ToString();
                 textHealth.color = Color.white;
                 ui_username.text = PV.Owner.NickName;
-                playerUsername.text = PV.Owner.NickName;
+                playerUsername.text = PV.Owner.NickName; // ici ?
+                playerUsername.gameObject.SetActive(false);
             #endregion
             
             CharacterController.detectCollisions = false;
 
             EquipItem(0);
-            //items[0].Equip();
             
             if (EscapeMod)
                 SettingsMenu.EnableMouse();
@@ -117,12 +123,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     void Update()
     {
-        //var v = transform.InverseTransformDirection(CharacterController.velocity);
-        //Debug.Log($"CC Z velocity : {v.z}, X : {v.x}");
+        Debug.Log($"PlayerData K : {PlayerData.Instance.globalKills}, D : {PlayerData.Instance.globalDeaths}");
+        Debug.Log($"CustomProperties K : {PhotonNetwork.LocalPlayer.CustomProperties["K"]}, D : {PhotonNetwork.LocalPlayer.CustomProperties["D"]}");
         
         if(!PV.IsMine)
             return;
-        
+
         #region Movement
             wasGrounded = grounded;
             grounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
@@ -131,7 +137,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             {
                 if (velocity.y < fallSpeedThreshold)
                 {
-                    float fallDamage = Mathf.Round(-7f * velocity.y - 100f) ;
+                    float fallDamage = Mathf.Round(-4f * velocity.y - 27) ;
                     RPC_TakeDamage(fallDamage, null, -1);
                 }
             }
@@ -140,9 +146,23 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 velocity.y = -2f;
 
             velocity.y += gravity * Time.deltaTime;
-            CharacterController.Move(velocity * Time.deltaTime);
         #endregion
 
+        #region Cheats
+
+            // partie cheats pour ne pas être bloqué lors de la soutenance
+
+            if (Input.GetKeyDown(KeyCode.F9))
+            {
+                currentHealth = MaxHealth;
+                textHealth.text = currentHealth.ToString();
+            }
+
+            if(Input.GetKeyDown(KeyCode.F8))
+                    Die();
+
+        #endregion
+        
         if (!EscapeMod)
         {
             Look(); Jump(); UseItem(); Move();
@@ -163,16 +183,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         if (!grounded)
         {
-            horizontalInput *= airMultiplyer;
-            verticalInput *= airMultiplyer;
+            horizontalInput *= airMultiplier;
+            verticalInput *= airMultiplier;
         }
         
         moveSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed;
         
         Vector3 move = Vector3.ClampMagnitude((transform.right * horizontalInput + transform.forward * verticalInput), 1f);
-        //Vector3 fixedMove = Vector3.Lerp(move, CharacterController.velocity, 5f);
-            
-        CharacterController.Move(move * moveSpeed * Time.deltaTime);
+        
+        CharacterController.Move(move * moveSpeed * Time.deltaTime + velocity * Time.deltaTime);
     }
 
     void Jump()
@@ -183,8 +202,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     void Look()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * 0.5f;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * 0.5f;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * 0.5f * sensMultiplier;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * 0.5f * sensMultiplier;
 
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
@@ -266,30 +285,81 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (changedProps.ContainsKey("D"))
         {
             Debug.Log($"PC : {targetPlayer.NickName} died {(int)changedProps["D"]} times.");
-            
-            if (targetPlayer == PV.Owner)
+
+            if (targetPlayer == PhotonNetwork.LocalPlayer && (int)changedProps["D"] != 0)
+            {
+                Debug.Log("Deaths ++");
                 ui_death.text = "DEATHS : " + Convert.ToString((int)changedProps["D"]);
+                PlayerData.Instance.globalDeaths++;
+            }
         }
 
         if (changedProps.ContainsKey("K"))
         {
             Debug.Log($"PC : {targetPlayer.NickName} has {(int) changedProps["K"]} kills.");
 
-            if (targetPlayer == PV.Owner)
+            if (targetPlayer == PhotonNetwork.LocalPlayer && (int)changedProps["K"] != 0)
+            {
+                Debug.Log("Kills ++");
                 ui_kills.text = "KILLS : " + Convert.ToString((int)changedProps["K"]);
+                PlayerData.Instance.globalKills++;
+            }
         }
     }
 
+    /*
+    public void TakeDamage(float damage, Player opponent, int gunIndex)
+    {
+        PV.RPC("RPC_TakeDamage", RpcTarget.All, damage, opponent, gunIndex);
+    }
+    */
+    
     public void TakeDamage(float damage, Player opponent, int gunIndex)
     {
         PV.RPC("RPC_TakeDamage", RpcTarget.All, damage, opponent, gunIndex);
     }
 
+    public void TakeDamage(float damage, string opponentName, int gunIndex)
+    {
+        PV.RPC("RPC_TakeDamageName", RpcTarget.All, damage, opponentName, gunIndex);
+    }
+
+    [PunRPC]
+    void RPC_TakeDamageName(float damage, string opponentName, int gunIndex)
+    {
+        if (!PV.IsMine)
+            return;
+        
+        Animator.Play("Hit Reaction");
+        
+        currentHealth -= damage;
+
+        if (currentHealth <= 0)
+        {
+            KillFeed.KillFeedEntry(PV.Controller.NickName, opponentName, gunIndex);
+
+            Die();
+        }
+        else
+        {
+            if (currentHealth <= 10)
+                textHealth.color = Color.red;
+            
+            textHealth.text = currentHealth.ToString();
+            HealthBar.SetHealth(currentHealth);
+            
+            // UIManager.Instance.HitEffect();
+            StartCoroutine(cam.GetComponent<CameraEffect>().ShakeCamera(0.03f));
+        }
+    }
+    
     [PunRPC]
     void RPC_TakeDamage(float damage, Player opponent, int gunIndex)
     {
         if (!PV.IsMine)
             return;
+        
+        Animator.Play("Hit Reaction");
         
         currentHealth -= damage;
 
@@ -323,13 +393,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         H.Add("K", deathOfParent + 1);
         player.SetCustomProperties(H);
 
-        PlayerData.Instance.globalKills++;
+        //PlayerData.Instance.globalKills++;
     }
 
     void Die()
     {
         deathAudio.Play();
-        items[itemIndex].Unequip();
+        //items[itemIndex].Unequip();
         playerManager.Die();
     }
 }

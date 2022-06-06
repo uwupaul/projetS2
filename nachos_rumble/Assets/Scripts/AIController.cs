@@ -1,111 +1,158 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Numerics;
 using UnityEngine;
 using Photon.Realtime;
-using UnityEngine.UI;
 using Photon.Pun;
 using UnityEngine.AI;
 using Vector3 = UnityEngine.Vector3;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class AIController : MonoBehaviourPunCallbacks, IDamageable
 {
-    // Rôle du controller:
-    //      - prendre des dégats et potentiellement mourir
-    //      - donner des dégâts aux ennemis
-    //      - se déplacer en cherchant l'ennemi (non-IA) le plus proche
+    private AIManager AIManager;
+    private PhotonView PV;
     
-    // Problèmes à régler:
-    //      - l'IA se met à bugger dès qu'un joueur la touche -> pourquoi??
-    //      - l'IA ne peut pas monter les pentes (on dirait il faut essayer sur un autre map) -> pourquoi ??
-    //      - l'IA n'est pas détectée comme un gameobject -> on ne peut pas lui tirer dessus ? je comprends pas pourquoi
+    private Animator Animator;
+    
+    private int zVelHash;
+    private int xVelHash;
 
+    public NavMeshAgent agent;
+    
+    public Transform target;
+    public bool searching;
 
-    #region Health
-        const float maxHealth = 100f;
-        float currentHealth = maxHealth;
-    #endregion
-    
-    Rigidbody rb;
-    PhotonView PV;
-    AIManager aiManager;
-    public NavMeshAgent navMeshAgent;
-    
+    public int health;
+
+    private KillFeed KillFeed;
+
+    public bool canAttack;
+    public float attackTime;
+    public float attackRange;
+
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        KillFeed = GameObject.Find("Canvas/KillFeed").GetComponent<KillFeed>();
         PV = GetComponent<PhotonView>();
-        aiManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<AIManager>();
+        AIManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<AIManager>();
+        agent = GetComponent<NavMeshAgent>();
+        Animator = GetComponent<Animator>();
     }
 
     private void Start()
     {
-        if (PV.IsMine)
-        {
-            //EquipItem(0); // équiper l'item mais il doit être équipé de base non? à voir
-        }
-        else
-        {
-            Destroy(rb);
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        // - trouver le gameObject avec le tag 'Player' le plus proche
-        // demander à la navmesh de s'y rendre
-        
-        // FIX: set la destination du navMeshAgent dans une coroutine toute les 0.1 ou 0.2 secondes mais pas ici
-        
-        if(!PV.IsMine)
+        if (!PhotonNetwork.IsMasterClient)
             return;
         
-        navMeshAgent.SetDestination(FindTarget());
+        zVelHash = Animator.StringToHash("Z_Velocity");
+        xVelHash= Animator.StringToHash("X_Velocity");
     }
 
-    Vector3 FindTarget()
+    private void Update()
     {
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        float minDistance = Single.PositiveInfinity;
-        Vector3 bestTarget = transform.position;
-        // on set bestTarget comme la position même du Controller, comme ça si elle ne trouve pas de cible, elle ne bouge pas
+        if (!PhotonNetwork.IsMasterClient)
+            return;
         
-        foreach (GameObject p in players)
+        SetAnimation();
+        if (!searching)
+            StartCoroutine(FindTarget());
+
+        if (target != null && Vector3.Distance(transform.position, target.position) < attackRange)
+            StartCoroutine(AttackPlayer());
+    }
+
+    IEnumerator FindTarget()
+    {
+        searching = true;
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Player");
+        float minDistance = Single.MaxValue;
+        target = enemies.Length == 0 ? gameObject.transform : enemies[0].transform;
+
+        foreach (var enemy in enemies)
         {
-            float newDistance = Vector3.Distance(transform.position, p.transform.position);
-            // changer ça pour pas faire qu'une ia s'arrête sans rien faire quand un joueur est au dessus d'elle 
-            
-            if (newDistance < minDistance) {
-                minDistance = newDistance;
-                bestTarget = p.transform.position;
+            float enemyDistance = Vector3.Distance(transform.position, enemy.transform.position);
+            if (enemyDistance < minDistance)
+            {
+                minDistance = enemyDistance;
+                target = enemy.gameObject.transform;
             }
         }
+        agent.SetDestination(target.position); 
 
-        return bestTarget;
+        yield return new WaitForSecondsRealtime(0.03f);
+        searching = false;
+    }
+
+    void SetAnimation() 
+    {
+        var vel = agent.velocity;
+        var v = transform.InverseTransformDirection(vel);
+
+        //Debug.Log($"X : {Animator.GetFloat("X_Velocity")}, Z : {Animator.GetFloat("Z_Velocity")}");
+        
+        Animator.SetFloat(zVelHash, v.z);
+        Animator.SetFloat(xVelHash, v.x);
+    }
+    
+    private IEnumerator AttackPlayer()
+    {
+        if (!canAttack)
+            yield break;
+        
+        canAttack = false;
+        agent.velocity = Vector3.Lerp(agent.velocity * 0.5f, Vector3.zero, Time.deltaTime);
+        transform.LookAt(target);
+        Animator.SetTrigger("Melee");
+        
+        yield return new WaitForSecondsRealtime(attackTime / 4);
+        
+        target.gameObject.GetComponent<IDamageable>().TakeDamage(25, "Angry Mexican", 3);
+
+        yield return new WaitForSecondsRealtime(attackTime * 3/4);
+        canAttack = true;
     }
 
     public void TakeDamage(float damage, Player opponent, int gunIndex)
     {
-        PV.RPC("RPC_TakeDamage", RpcTarget.All, damage, opponent);
-        Debug.Log($"AI took {damage} damage.");
+        PV.RPC("RPC_TakeDamage", RpcTarget.MasterClient, damage, opponent, gunIndex);
+    }
+
+
+    [PunRPC]
+    public void RPC_TakeDamage(float damage, Player opponent, int gunIndex)
+    {
+        Animator.Play("Hit Reaction");
+        agent.velocity = Vector3.zero;
+        
+        health -= (int) damage;
+
+        if (health <= 0)
+        {
+            KillFeed.KillFeedEntry("Angry Mexican", opponent.NickName, gunIndex);
+            ApplyKill(opponent);
+            Die();
+        }
     }
     
-    [PunRPC]
-    void RPC_TakeDamage(float damage)
+    void ApplyKill(Player player)
     {
-        if (!PV.IsMine)
-            return;
+        Debug.Log("AI Controller called Applykill on " + player.NickName);
         
-        currentHealth -= damage;
+        Hashtable H = new Hashtable();
+        int deathOfParent = Convert.ToInt32(player.CustomProperties["K"]);
         
-        if (currentHealth <= 0)
-            Die();
+        H.Add("K", deathOfParent + 1);
+        player.SetCustomProperties(H);
+    }
+
+    public void TakeDamage(float damage, string opponentName, int gunIndex)
+    {
+        throw new NotImplementedException();
+        // pas utile dans cette classe
     }
 
     void Die()
     {
-        Debug.Log("AIController : Die()");
-        aiManager.Die();
+        AIManager.Die(this);
     }
 }

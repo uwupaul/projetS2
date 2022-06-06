@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     private void Start()
     {
         QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = 100;
         
         Hashtable H1 = new Hashtable();
         Hashtable H2 = new Hashtable();
@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
     {
-        if (!PhotonNetwork.LocalPlayer.IsMasterClient) //|| (bool)PhotonNetwork.CurrentRoom.CustomProperties["ENDED"])
+        if (!PhotonNetwork.LocalPlayer.IsMasterClient || gameEnded)
             return;
         
         if (changedProps.ContainsKey("K"))

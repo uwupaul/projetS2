@@ -1341,11 +1341,14 @@ MonoBehaviour:
     SynchronizeType: 2
     Name: Grounded
   - Type: 9
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: Hit
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: Melee
+  - Type: 4
+    SynchronizeType: 1
+    Name: always true
   m_SynchronizeLayers:
   - SynchronizeType: 2
     LayerIndex: 0

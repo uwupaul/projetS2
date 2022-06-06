@@ -1737,8 +1737,17 @@ MonoBehaviour:
     SynchronizeType: 2
     Name: Z_Velocity
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: Grounded
+  - Type: 9
+    SynchronizeType: 2
+    Name: Hit
+  - Type: 9
+    SynchronizeType: 0
+    Name: Melee
+  - Type: 4
+    SynchronizeType: 0
+    Name: always true
   m_SynchronizeLayers:
   - SynchronizeType: 2
     LayerIndex: 0

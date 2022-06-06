@@ -154,8 +154,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
             if (Input.GetKeyDown(KeyCode.F9))
             {
-                currentHealth = MaxHealth;
-                textHealth.text = currentHealth.ToString();
+                HealthBar.SetMaxHealth(MaxHealth);
+                textHealth.text = MaxHealth.ToString();
+                textHealth.color = Color.white;
             }
 
             if(Input.GetKeyDown(KeyCode.F8))
@@ -329,7 +330,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         if (!PV.IsMine)
             return;
-        
+
         Animator.Play("Hit Reaction");
         
         currentHealth -= damage;
@@ -360,7 +361,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             return;
         
         Animator.Play("Hit Reaction");
-        
+
         currentHealth -= damage;
 
         if (currentHealth <= 0)

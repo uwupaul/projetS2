@@ -9,7 +9,11 @@ public class Windowmanager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            ScoreBoard.SetActive(!ScoreBoard.activeSelf);
+            ScoreBoard.SetActive(true);
+        }
+        else if (Input.GetKeyUp(KeyCode.Tab))
+        {
+            ScoreBoard.SetActive(false);
         }
     }
 }

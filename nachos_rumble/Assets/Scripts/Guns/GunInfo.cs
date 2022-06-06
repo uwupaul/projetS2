@@ -14,4 +14,5 @@ public class GunInfo : ItemInfo
     public float movementPrecisionMultiplier;
     public float adsFOV;
     public float hipFOV;
+    public float bulletInGun;
 }

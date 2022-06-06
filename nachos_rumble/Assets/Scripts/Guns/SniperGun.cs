@@ -12,6 +12,7 @@ public class SniperGun : Gun
     private bool canShoot;
 
     public AudioSource shootingSound;
+    public AudioSource reloadSound;
     public Animator animator;
 
     public GameObject scopeOverlay;
@@ -167,6 +168,8 @@ public class SniperGun : Gun
         {
             canShoot = false;
             Unscope();
+            reloadSound.Play();
+            
             yield return new WaitForSeconds(reloadTime);
             
             if (!isEquiped)

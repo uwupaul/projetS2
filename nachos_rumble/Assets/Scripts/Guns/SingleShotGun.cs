@@ -26,6 +26,7 @@ public class SingleShotGun : Gun
     #endregion
 
     public AudioSource shootingSound;
+    public AudioSource reloadSound;
     public Animator animator;
 
 
@@ -132,6 +133,7 @@ public class SingleShotGun : Gun
         IEnumerator Reload()
         {
             canShoot = false;
+            reloadSound.Play();
         
             yield return new WaitForSeconds(reloadTime);
 

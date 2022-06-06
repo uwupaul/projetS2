@@ -27,6 +27,7 @@ public class AutomaticGun : Gun
     
     
     public AudioSource shootingSound;
+    public AudioSource reloadSound;
     public Animator animator;
     
     private GameObject crossHair;
@@ -85,7 +86,7 @@ public class AutomaticGun : Gun
         if (Input.GetMouseButtonDown(1))
             ToggleScope();
     }
-
+    
     public override void Equip()
     {
         isEquiped = true;
@@ -175,6 +176,7 @@ public class AutomaticGun : Gun
     {
         canShoot = false;
         Unscope();
+        reloadSound.Play();
         
         yield return new WaitForSeconds(reloadTime);
         

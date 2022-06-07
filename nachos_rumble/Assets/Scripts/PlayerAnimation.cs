@@ -40,7 +40,7 @@ public class PlayerAnimation : MonoBehaviour
         Debug.Log($"CC Z velocity : {v.z}, X : {v.x}");
 
         //Debug.Log($"X : {Animator.GetFloat("X_Velocity")}, Z : {Animator.GetFloat("Z_Velocity")}");
-        v = Vector3.Lerp(v, new Vector3(Animator.GetFloat("X_Velocity"), 0, Animator.GetFloat("Z_Velocity")), Time.deltaTime);
+        //v = Vector3.Lerp(v, new Vector3(Animator.GetFloat("X_Velocity"), 0, Animator.GetFloat("Z_Velocity")), Time.deltaTime);
         
         Animator.SetFloat(zVelHash, v.z);
         Animator.SetFloat(xVelHash, v.x);

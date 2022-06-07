@@ -2034,13 +2034,13 @@ GameObject:
   - component: {fileID: 4118048167697358159}
   - component: {fileID: 6613340301531623142}
   - component: {fileID: 6692611012544162669}
-  - component: {fileID: 7537678318609877749}
   - component: {fileID: 8304552745850538872}
   - component: {fileID: 2320492353177007065}
   - component: {fileID: 4207890169553866801}
   - component: {fileID: 878503841908261143}
   - component: {fileID: 2595268910709730743}
   - component: {fileID: 8783792218434280078}
+  - component: {fileID: 7114204371234103332}
   m_Layer: 0
   m_Name: PlayerController
   m_TagString: Player
@@ -2105,24 +2105,6 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
---- !u!143 &7537678318609877749
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1391451876877796243}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 2.5
-  m_Radius: 0.35
-  m_SlopeLimit: 55
-  m_StepOffset: 0.4
-  m_SkinWidth: 0.01
-  m_MinMoveDistance: 0.02
-  m_Center: {x: 0, y: 0.2, z: 0}
 --- !u!136 &8304552745850538872
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2300,6 +2282,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 2
     Name: Twerk
+  - Type: 4
+    SynchronizeType: 2
+    Name: Dance
   m_SynchronizeLayers:
   - SynchronizeType: 2
     LayerIndex: 0
@@ -2338,10 +2323,28 @@ MonoBehaviour:
   airMultiplier: 0.75
   fallSpeedThreshold: -9
   gravity: -20
-  CharacterController: {fileID: 7537678318609877749}
+  CharacterController: {fileID: 7114204371234103332}
   Speed: 0
   currentHealth: 100
   deathAudio: {fileID: 6013885188320245832}
+--- !u!143 &7114204371234103332
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1391451876877796243}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 2.5
+  m_Radius: 0.35
+  m_SlopeLimit: 55
+  m_StepOffset: 0.4
+  m_SkinWidth: 0.01
+  m_MinMoveDistance: 0.02
+  m_Center: {x: 0, y: 0.2, z: 0}
 --- !u!1 &1448837776532654265
 GameObject:
   m_ObjectHideFlags: 0

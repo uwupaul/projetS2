@@ -163,19 +163,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             if(Input.GetKeyDown(KeyCode.F8))
                     Die();
 
-            if (Input.GetKeyDown(KeyCode.P))
-            {
-                items[itemIndex].Unequip();
-                Animator.SetBool("Twerk", true);
-            }
-            
-            if (Input.GetKeyUp(KeyCode.P))
-            {
-                //items[itemIndex].E();
-                Animator.SetBool("Twerk", false);
-            }
-            
-            
+            Emote();
+
         #endregion
         
         if (!EscapeMod)
@@ -205,7 +194,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         moveSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed;
         
         Vector3 move = Vector3.ClampMagnitude(transform.right * horizontalInput + transform.forward * verticalInput, 1f);
-        
+
         CharacterController.Move(move * moveSpeed * Time.deltaTime + velocity * Time.deltaTime);
     }
 
@@ -213,6 +202,33 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         if (Input.GetKeyDown(KeyCode.Space) && grounded)
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+    }
+
+    void Emote()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            items[itemIndex].Unequip();
+            Animator.SetBool("Twerk", true);
+        }
+            
+        if (Input.GetKeyUp(KeyCode.P))
+        {
+            //items[itemIndex].E();
+            Animator.SetBool("Twerk", false);
+        }
+        
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            items[itemIndex].Unequip();
+            Animator.SetBool("Dance", true);
+        }
+            
+        if (Input.GetKeyUp(KeyCode.M))
+        {
+            //items[itemIndex].E();
+            Animator.SetBool("Dance", false);
+        }
     }
 
     void Look()

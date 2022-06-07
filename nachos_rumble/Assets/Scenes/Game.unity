@@ -12268,7 +12268,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecd428b186da9454d9999a8d980dea9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreToWin: 5
+  scoreToWin: 20
   EndScreen: {fileID: 256108152}
   TitleText: {fileID: 888805130}
   subTitleText: {fileID: 632766197}

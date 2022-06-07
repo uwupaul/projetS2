@@ -76,6 +76,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     #endregion
 
     private Animator Animator;
+    private PlayerAnimation PlayerAnimation;
     
     void Awake()
     {
@@ -83,6 +84,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
         UIM = playerManager.GetComponentInChildren<UIManager>();
         Animator = GetComponent<Animator>();
+        PlayerAnimation = GetComponent<PlayerAnimation>();
     }
 
     void Start()
@@ -90,7 +92,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (PV.IsMine)
         {
             (items, secondItems) = (secondItems, items);
-
 
             #region UI
                 ui_username = GameObject.Find("Canvas/BottomLeft/UsernameText").GetComponent<TextMeshProUGUI>();
@@ -196,6 +197,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         Vector3 move = Vector3.ClampMagnitude(transform.right * horizontalInput + transform.forward * verticalInput, 1f);
 
         CharacterController.Move(move * moveSpeed * Time.deltaTime + velocity * Time.deltaTime);
+
+
+        var v = transform.InverseTransformDirection(move);
+        PlayerAnimation.SetAnimation(v * moveSpeed);
     }
 
     void Jump()
@@ -209,6 +214,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (Input.GetKeyDown(KeyCode.P))
         {
             items[itemIndex].Unequip();
+            
             Animator.SetBool("Twerk", true);
         }
             

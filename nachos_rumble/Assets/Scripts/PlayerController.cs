@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     #region Items
         public Item[] items;
+        public Item[] secondItems;
         int itemIndex;
         int previousItemIndex = -1;
 
@@ -48,6 +49,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         public CharacterController CharacterController;
         public float Speed;
+        
     #endregion
     
     #region Health
@@ -87,6 +89,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         if (PV.IsMine)
         {
+            (items, secondItems) = (secondItems, items);
+
+
             #region UI
                 ui_username = GameObject.Find("Canvas/BottomLeft/UsernameText").GetComponent<TextMeshProUGUI>();
                 ui_kills = GameObject.Find("Canvas/TopLeft/KillsText").GetComponent<TextMeshProUGUI>();
@@ -119,9 +124,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     void Update()
     {
-        Debug.Log($"PlayerData K : {PlayerData.Instance.globalKills}, D : {PlayerData.Instance.globalDeaths}");
-        Debug.Log($"CustomProperties K : {PhotonNetwork.LocalPlayer.CustomProperties["K"]}, D : {PhotonNetwork.LocalPlayer.CustomProperties["D"]}");
-        
+        //Debug.Log($"PlayerData K : {PlayerData.Instance.globalKills}, D : {PlayerData.Instance.globalDeaths}");
+        //Debug.Log($"CustomProperties K : {PhotonNetwork.LocalPlayer.CustomProperties["K"]}, D : {PhotonNetwork.LocalPlayer.CustomProperties["D"]}");
+
         if(!PV.IsMine)
             return;
 
@@ -161,8 +166,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             if (Input.GetKeyDown(KeyCode.P))
             {
                 items[itemIndex].Unequip();
-                Animator.Play("Twerk");
+                Animator.SetBool("Twerk", true);
             }
+            
+            if (Input.GetKeyUp(KeyCode.P))
+            {
+                //items[itemIndex].E();
+                Animator.SetBool("Twerk", false);
+            }
+            
             
         #endregion
         
@@ -192,7 +204,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         
         moveSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed;
         
-        Vector3 move = Vector3.ClampMagnitude((transform.right * horizontalInput + transform.forward * verticalInput), 1f);
+        Vector3 move = Vector3.ClampMagnitude(transform.right * horizontalInput + transform.forward * verticalInput, 1f);
         
         CharacterController.Move(move * moveSpeed * Time.deltaTime + velocity * Time.deltaTime);
     }
@@ -221,6 +233,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     void EquipItemVisually(int _index)
     {
+        // Mettre les armes qui sont dans le rig
+
         if (_index == previousItemIndex)
             return;
         
@@ -241,9 +255,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         itemIndex = _index;
 
         if (previousItemIndex != -1)
+        {
             items[previousItemIndex].Unequip();
+            //secondItems[previousItemIndex].itemGameObject.SetActive(false);
+        }
         
         items[itemIndex].Equip();
+        //secondItems[itemIndex].itemGameObject.SetActive(true);
+        
         previousItemIndex = itemIndex;
     }
 
@@ -258,9 +277,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
                 itemIndex = i;
                 items[itemIndex].Equip();
-                
+                secondItems[itemIndex].itemGameObject.SetActive(true);
+
                 if (previousItemIndex != -1)
+                {
                     items[previousItemIndex].Unequip();
+                    secondItems[previousItemIndex].itemGameObject.SetActive(false);
+                }
 
                 previousItemIndex = itemIndex;
             }

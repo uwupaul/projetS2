@@ -35,8 +35,9 @@ public class PlayerAnimation : MonoBehaviour
             return;
 
         var vel = CharacterController.velocity;
+        Debug.Log($"{vel.x}, y : {vel.z}");
         var v = transform.InverseTransformDirection(vel);
-        //Debug.Log($"CC Z velocity : {v.z}, X : {v.x}");
+        Debug.Log($"CC Z velocity : {v.z}, X : {v.x}");
 
         //Debug.Log($"X : {Animator.GetFloat("X_Velocity")}, Z : {Animator.GetFloat("Z_Velocity")}");
         v = Vector3.Lerp(v, new Vector3(Animator.GetFloat("X_Velocity"), 0, Animator.GetFloat("Z_Velocity")), Time.deltaTime);
